@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paşam Döner - Sipariş Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 50%, #ff4500 100%);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(255, 69, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ff8c00;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .fire-text {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #ff4500;
+            position: relative;
+            animation: flicker 1.5s infinite alternate;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #ff4500, 0 0 40px #ff4500;
+            }
+            20%, 24%, 55% {
+                text-shadow: 0 0 5px #ff4500, 0 0 10px #ff4500, 0 0 15px #ff4500, 0 0 20px #ff4500;
+            }
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            font-weight: 500;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .menu-section {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #444;
+        }
+
+        .menu-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(255, 69, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #ff8c00;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #444;
+            position: relative;
+            font-weight: 700;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #ff4500, #ff8c00);
+            border-radius: 3px;
+        }
+
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-item {
+            background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid #444;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 140, 0, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+            border-color: #ff8c00;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: #fff;
+        }
+
+        .item-price {
+            color: #ff8c00;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-top: 5px;
+            text-shadow: 0 0 5px rgba(255, 140, 0, 0.3);
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quantity-btn {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 100%);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(255, 69, 0, 0.4);
+            font-weight: bold;
+        }
+
+        .quantity-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 12px rgba(255, 69, 0, 0.6);
+        }
+
+        .quantity {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 1rem;
+            transition: border 0.3s, box-shadow 0.3s;
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .notes-section textarea:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2);
+        }
+
+        .address-section {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            border: 1px solid #444;
+        }
+
+        .address-row {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .address-input {
+            flex: 1;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #444;
+            border-radius: 10px;
+            background: #2a2a2a;
+            transition: border 0.3s, box-shadow 0.3s;
+            color: #fff;
+        }
+
+        .address-input:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2);
+        }
+
+        .address-input::placeholder {
+            color: #888;
+        }
+
+        .payment-section {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            border: 1px solid #444;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .payment-option {
+            flex: 1;
+            text-align: center;
+        }
+
+        .payment-radio {
+            display: none;
+        }
+
+        .payment-label {
+            display: block;
+            padding: 15px;
+            background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
+            border: 2px solid #444;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #ddd;
+        }
+
+        .payment-radio:checked + .payment-label {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 100%);
+            border-color: #ff8c00;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+        }
+
+        .payment-label:hover {
+            border-color: #ff8c00;
+            transform: translateY(-3px);
+        }
+
+        .order-summary {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            border: 2px solid #444;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s;
+        }
+
+        .summary-item:hover {
+            background: rgba(255, 140, 0, 0.05);
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ff8c00;
+            border-top: 2px solid #444;
+            margin-top: 15px;
+            text-shadow: 0 0 5px rgba(255, 140, 0, 0.3);
+        }
+
+        .order-time {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 2px dashed #444;
+            font-style: italic;
+            color: #aaa;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 100%);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(255, 69, 0, 0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(255, 69, 0, 0.7);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 35px;
+            padding: 25px;
+            color: #888;
+            font-size: 0.95rem;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid #444;
+        }
+
+        @media (max-width: 768px) {
+            .menu-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .address-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .payment-options {
+                flex-direction: column;
+            }
+            
+            .fire-text {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="fire-text">🔥Paşam Döner 🔥</h1>
+            <p>Lezzetin en güzel hali</p>
+        </header>
+
+        <section class="menu-section">
+            <h2 class="section-title">Döner Çeşitlerimiz</h2>
+            <div class="menu-items">
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Tek Lavaş Döner</div>
+                        <div class="item-price">120 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="tek-doner">-</button>
+                        <span class="quantity" id="tek-doner-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="tek-doner">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Çift Lavaş Döner</div>
+                        <div class="item-price">130 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="cift-doner">-</button>
+                        <span class="quantity" id="cift-doner-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="cift-doner">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Burger Tavuk Döner</div>
+                        <div class="item-price">120 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="burger-tavuk-doner">-</button>
+                        <span class="quantity" id="burger-tavuk-doner-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="burger-tavuk-doner">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Zurna</div>
+                        <div class="item-price">200 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="zurna">-</button>
+                        <span class="quantity" id="zurna-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="zurna">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Sütlü Ekmek</div>
+                        <div class="item-price">120 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="sutlu-ekmek">-</button>
+                        <span class="quantity" id="sutlu-ekmek-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="sutlu-ekmek">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">İçi 1 Buçuk Döner</div>
+                        <div class="item-price">200 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="ici-bucuk-doner">-</button>
+                        <span class="quantity" id="ici-bucuk-doner-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="ici-bucuk-doner">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="menu-section">
+            <h2 class="section-title">İçeceklerimiz</h2>
+            <div class="menu-items">
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Kola</div>
+                        <div class="item-price">40 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="kola">-</button>
+                        <span class="quantity" id="kola-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="kola">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Büyük Ayran</div>
+                        <div class="item-price">20 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="ayran">-</button>
+                        <span class="quantity" id="ayran-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="ayran">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Şalgam</div>
+                        <div class="item-price">20 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="salgam">-</button>
+                        <span class="quantity" id="salgam-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="salgam">+</button>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">Su</div>
+                        <div class="item-price">10 ₺</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus" data-item="su">-</button>
+                        <span class="quantity" id="su-quantity">0</span>
+                        <button class="quantity-btn plus" data-item="su">+</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="menu-section">
+            <h2 class="section-title">DÖNERİNİZ NASIL OLSUN 🙂?</h2>
+            <div class="notes-section">
+                <textarea id="order-notes" placeholder="Örneğin full olsun veya ketçap olmasın "></textarea>
+            </div>
+        </section>
+
+        <section class="address-section">
+            <h2 class="section-title">Adres Bilgilerinizi Giriniz</h2>
+            <div class="address-row">
+                <input type="text" class="address-input" id="name" placeholder="İsminiz">
+                <input type="text" class="address-input" id="surname" placeholder="Soyisminiz">
+            </div>
+            <div class="address-row">
+                <input type="text" class="address-input" id="phone" placeholder="Telefon numaranız">
+            </div>
+            <div class="address-row">
+                <input type="text" class="address-input" id="address" placeholder="Adresiniz">
+            </div>
+        </section>
+
+        <section class="payment-section">
+            <h2 class="section-title">Ödeme Şeklini Seçiniz</h2>
+            <div class="payment-options">
+                <div class="payment-option">
+                    <input type="radio" id="cash" name="payment" class="payment-radio" value="Nakit" checked>
+                    <label for="cash" class="payment-label">Nakit</label>
+                </div>
+                <div class="payment-option">
+                    <input type="radio" id="card" name="payment" class="payment-radio" value="Kart">
+                    <label for="card" class="payment-label">Kart</label>
+                </div>
+            </div>
+        </section>
+
+        <section class="order-summary">
+            <h2 class="section-title">Sipariş Özeti</h2>
+            <div id="summary-items">
+                <!-- Sipariş öğeleri JavaScript ile buraya eklenecek -->
+            </div>
+            <div class="summary-total">
+                <span>Toplam:</span>
+                <span id="total-price">0 ₺</span>
+            </div>
+            <div class="order-time" id="order-time">
+                <!-- Sipariş zamanı buraya eklenecek -->
+            </div>
+        </section>
+
+        <button class="submit-btn" id="submit-order">Siparişi Gönder</button>
+
+
+    
+
+    <script>
+        // Ürün fiyatları
+        const prices = {
+            'tek-doner': 120,
+            'cift-doner': 130,
+            'burger-tavuk-doner': 120,
+            'zurna': 200,
+            'sutlu-ekmek': 120,
+            'ici-bucuk-doner': 200,
+            'kola': 40,
+            'ayran': 20,
+            'salgam': 20,
+            'su': 10
+        };
+
+        // Ürün isimleri
+        const productNames = {
+            'tek-doner': 'Tek Lavaş Döner',
+            'cift-doner': 'Çift Lavaş Döner',
+            'burger-tavuk-doner': 'Burger Tavuk Döner',
+            'zurna': 'Zurna',
+            'sutlu-ekmek': 'Sütlü Ekmek',
+            'ici-bucuk-doner': 'İçi 1 Buçuk Döner',
+            'kola': 'Kola',
+            'ayran': 'Büyük Ayran',
+            'salgam': 'Şalgam',
+            'su': 'Su'
+        };
+
+        // Miktar değişkenleri
+        let quantities = {
+            'tek-doner': 0,
+            'cift-doner': 0,
+            'burger-tavuk-doner': 0,
+            'zurna': 0,
+            'sutlu-ekmek': 0,
+            'ici-bucuk-doner': 0,
+            'kola': 0,
+            'ayran': 0,
+            'salgam': 0,
+            'su': 0
+        };
+
+        // Miktar butonlarına tıklama olaylarını ekle
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const item = this.getAttribute('data-item');
+                const isPlus = this.classList.contains('plus');
+                
+                if (isPlus) {
+                    quantities[item]++;
+                } else if (quantities[item] > 0) {
+                    quantities[item]--;
+                }
+                
+                // Miktarı güncelle
+                document.getElementById(`${item}-quantity`).textContent = quantities[item];
+                
+                // Sipariş özetini güncelle
+                updateOrderSummary();
+            });
+        });
+
+        // Tarih ve saat bilgisini al
+        function getCurrentDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('tr-TR');
+            const time = now.toLocaleTimeString('tr-TR');
+            return `${date} ${time}`;
+        }
+
+        // Sipariş özetini güncelle
+        function updateOrderSummary() {
+            const summaryItems = document.getElementById('summary-items');
+            const orderTime = document.getElementById('order-time');
+            let total = 0;
+            let summaryHTML = '';
+            
+            // Ürünleri ekle
+            for (const item in quantities) {
+                if (quantities[item] > 0) {
+                    const itemTotal = quantities[item] * prices[item];
+                    total += itemTotal;
+                    
+                    summaryHTML += `
+                        <div class="summary-item">
+                            <span>${productNames[item]} (${quantities[item]} adet)</span>
+                            <span>${itemTotal} ₺</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Notu ekle
+            const notes = document.getElementById('order-notes').value;
+            if (notes.trim() !== '') {
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span>Not:</span>
+                        <span>${notes}</span>
+                    </div>
+                `;
+            }
+            
+            // Adres bilgilerini ekle
+            const name = document.getElementById('name').value;
+            const surname = document.getElementById('surname').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            
+            if (name.trim() !== '' || surname.trim() !== '') {
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span>İsim Soyisim:</span>
+                        <span>${name} ${surname}</span>
+                    </div>
+                `;
+            }
+            
+            if (phone.trim() !== '') {
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span>Telefon:</span>
+                        <span>${phone}</span>
+                    </div>
+                `;
+            }
+            
+            if (address.trim() !== '') {
+                summaryHTML += `
+                    <div class="summary-item">
+                        <span>Adres:</span>
+                        <span>${address}</span>
+                    </div>
+                `;
+            }
+            
+            // Ödeme şeklini ekle
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            summaryHTML += `
+                <div class="summary-item">
+                    <span>Ödeme Şekli:</span>
+                    <span>${paymentMethod}</span>
+                </div>
+            `;
+            
+            summaryItems.innerHTML = summaryHTML;
+            document.getElementById('total-price').textContent = `${total} ₺`;
+            
+            // Tarih ve saat bilgisini güncelle
+            orderTime.textContent = `Sipariş Zamanı: ${getCurrentDateTime()}`;
+        }
+
+        // Adres bilgileri değiştiğinde sipariş özetini güncelle
+        document.getElementById('name').addEventListener('input', updateOrderSummary);
+        document.getElementById('surname').addEventListener('input', updateOrderSummary);
+        document.getElementById('phone').addEventListener('input', updateOrderSummary);
+        document.getElementById('address').addEventListener('input', updateOrderSummary);
+
+        // Notlar değiştiğinde sipariş özetini güncelle
+        document.getElementById('order-notes').addEventListener('input', updateOrderSummary);
+
+        // Ödeme şekli değiştiğinde sipariş özetini güncelle
+        document.querySelectorAll('.payment-radio').forEach(radio => {
+            radio.addEventListener('change', updateOrderSummary);
+        });
+
+        // Sipariş gönder butonuna tıklama olayını ekle
+        document.getElementById('submit-order').addEventListener('click', function() {
+            // Adres bilgileri kontrolü
+            const name = document.getElementById('name').value;
+            const surname = document.getElementById('surname').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            
+            if (name.trim() === '' || surname.trim() === '') {
+                alert('Lütfen isim ve soyisminizi giriniz!');
+                return;
+            }
+            
+            if (phone.trim() === '') {
+                alert('Lütfen telefon numaranızı giriniz!');
+                return;
+            }
+            
+            if (address.trim() === '') {
+                alert('Lütfen adres bilgilerinizi giriniz!');
+                return;
+            }
+            
+            // Sipariş bilgilerini hazırla
+            let orderMessage = "Dış mekan Döner Siparişi:\n\n";
+            
+            // Adres bilgilerini ekle
+            orderMessage += `İsim Soyisim: ${name} ${surname}\n`;
+            orderMessage += `Telefon: ${phone}\n`;
+            orderMessage += `Adres: ${address}\n\n`;
+            
+            // Ürünleri ekle
+            let hasItems = false;
+            for (const item in quantities) {
+                if (quantities[item] > 0) {
+                    hasItems = true;
+                    orderMessage += `${productNames[item]}: ${quantities[item]} adet - ${quantities[item] * prices[item]} ₺\n`;
+                }
+            }
+            
+            if (!hasItems) {
+                alert('Lütfen en az bir ürün seçin!');
+                return;
+            }
+            
+            // Notu ekle
+            const notes = document.getElementById('order-notes').value;
+            if (notes.trim() !== '') {
+                orderMessage += `\nNot: ${notes}\n`;
+            }
+            
+            // Ödeme şeklini ekle
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            orderMessage += `\nÖdeme Şekli: ${paymentMethod}\n`;
+            
+            // Toplam fiyatı ekle
+            let total = 0;
+            for (const item in quantities) {
+                total += quantities[item] * prices[item];
+            }
+            
+            // Tarih ve saat bilgisini ekle
+            orderMessage += `\nSipariş Zamanı: ${getCurrentDateTime()}`;
+            orderMessage += `\n\nToplam: ${total} ₺`;
+            
+            // WhatsApp numarası
+            const phoneNumber = "905557918718";
+            
+            // WhatsApp URL'si oluştur
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
+            
+            // WhatsApp'a yönlendir
+            window.open(whatsappURL, '_blank');
+            
+            // Sayfayı yenile
+            setTimeout(function() {
+                location.reload();
+            }, 1000);
+        });
+
+        // İlk sipariş özetini güncelle
+        updateOrderSummary();
+    </script>
+</body>
+</html>
