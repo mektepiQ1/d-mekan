@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paşam Döner - Ana Sayfa</title>
+    
+    <!-- Ana ekran ve PWA meta etiketleri -->
+    <meta name="theme-color" content="#0066ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Paşam Döner">
+    <meta name="msapplication-TileColor" content="#0066ff">
+    <meta name="msapplication-TileImage" content="flor.jpg">
+    
+    <!-- İkonlar -->
+    <link rel="apple-touch-icon" sizes="180x180" href="flor.jpg">
+    <link rel="icon" type="image/jpg" sizes="32x32" href="flor.jpg">
+    <link rel="icon" type="image/jpg" sizes="16x16" href="flor.jpg">
+    <link rel="shortcut icon" href="flor.jpg">
+    
+    <!-- Manifest dosyası -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #0a0a2a, #1a1a4a, #0f0f3a, #2a2a6a, #1a1a4a);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: all 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .menu-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 12px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Menü Arayüzü Stilleri */
+        .menu-interface {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background: linear-gradient(-45deg, #0a0a2a, #1a1a4a, #0f0f3a, #2a2a6a, #1a1a4a);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-interface::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            background-size: cover;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 30px;
+            z-index: 2;
+        }
+
+        .logo-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ffa726, #ffee58, #4cd964, #5ac8fa, #007aff, #5856d6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: rotate 20s linear infinite;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-circle::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .menu-title {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #0066ff, 0 0 20px #0066ff, 0 0 30px #0066ff;
+            animation: blue-flicker 2s infinite alternate;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(45deg, #00ccff, #0066ff, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        @keyframes blue-flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow: 0 0 10px #0066ff, 0 0 20px #0066ff, 0 0 30px #0066ff, 0 0 40px #0066ff;
+            }
+            20%, 24%, 55% {
+                text-shadow: 0 0 5px #0066ff, 0 0 10px #0066ff, 0 0 15px #0066ff, 0 0 20px #0066ff;
+            }
+        }
+
+        .menu-subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            color: #fff;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.7);
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(45deg, #ff8c00, #ff4500, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 5px 15px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 30px 0;
+            z-index: 2;
+            position: relative;
+        }
+
+        .menu-order-btn {
+            background: linear-gradient(135deg, #0066ff 0%, #00ccff 50%, #0066ff 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+
+        .menu-order-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.7s;
+        }
+
+        .menu-order-btn:hover::before {
+            left: 100%;
+        }
+
+        .menu-order-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 102, 255, 0.7);
+            background-position: 100% 0;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 0%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .menu-browse-btn {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 50%, #ff4500 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.5);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite 0.5s;
+        }
+
+        .menu-browse-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.7s;
+        }
+
+        .menu-browse-btn:hover::before {
+            left: 100%;
+        }
+
+        .menu-browse-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 69, 0, 0.7);
+            background-position: 100% 0;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 25px;
+            margin-top: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .social-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0066ff 0%, #00ccff 100%);
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.4s;
+            box-shadow: 0 6px 15px rgba(0, 102, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-icon::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .social-icon:hover::before {
+            transform: translateX(100%);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 102, 255, 0.6);
+        }
+
+        .social-icon.instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            box-shadow: 0 6px 15px rgba(220, 39, 67, 0.4);
+        }
+
+        .social-icon.map {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 100%);
+            box-shadow: 0 6px 15px rgba(255, 69, 0, 0.4);
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            width: 30px;
+            height: 30px;
+            animation-delay: 0s;
+            background: rgba(0, 204, 255, 0.3);
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            left: 80%;
+            width: 25px;
+            height: 25px;
+            animation-delay: 2s;
+            background: rgba(255, 140, 0, 0.3);
+        }
+
+        .floating-element:nth-child(3) {
+            top: 80%;
+            left: 20%;
+            width: 40px;
+            height: 40px;
+            animation-delay: 4s;
+            background: rgba(255, 69, 0, 0.3);
+        }
+
+        .floating-element:nth-child(4) {
+            top: 30%;
+            left: 70%;
+            width: 15px;
+            height: 15px;
+            animation-delay: 6s;
+            background: rgba(0, 102, 255, 0.3);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .tagline {
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            z-index: 2;
+            position: relative;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .menu-title {
+                font-size: 2.5rem;
+            }
+            
+            .menu-subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .menu-order-btn {
+                padding: 16px 35px;
+                font-size: 1.2rem;
+            }
+            
+            .menu-browse-btn {
+                padding: 14px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .social-icons {
+                gap: 20px;
+            }
+            
+            .social-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4rem;
+            }
+
+            .logo-circle {
+                width: 100px;
+                height: 100px;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .menu-title {
+                font-size: 2rem;
+            }
+            
+            .menu-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .menu-order-btn {
+                padding: 14px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .menu-browse-btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .social-icons {
+                gap: 15px;
+            }
+            
+            .social-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .logo-circle {
+                width: 80px;
+                height: 80px;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+                padding: 0 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menü Arayüzü -->
+    <div class="menu-interface">
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+        
+        <div class="menu-container">
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <div class="logo-text">PD</div>
+                </div>
+            </div>
+            
+            <h1 class="menu-title">Kadirli Paşam Döner</h1>
+            <h2 class="menu-subtitle">Erman Eren</h2>
+            
+            <div class="button-container">
+                <button class="menu-browse-btn" id="menuBrowseBtn">Menüye Bak</button>
+                <!-- Sipariş Ver butonu - sipariş formu sayfasına yönlendirecek -->
+                <a href="https://mektepiq1.github.io/d-mekan/u4.html" class="menu-order-btn">Sipariş Ver</a>
+            </div>
+            
+            <div class="social-icons">
+                <div class="social-icon instagram" id="instagramBtn">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <div class="social-icon map" id="mapBtn">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+            </div>
+            
+            <div class="tagline">
+                Lezzetin en taze hali, geleneksel tadın modern yorumu. Enfes dönerlerimizle hizmetinizdeyiz!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Menüye Bak butonu
+        document.getElementById('menuBrowseBtn').addEventListener('click', function() {
+            window.open('https://mektepiq1.github.io/pasammenu/t14.html', '_blank');
+        });
+
+        // Instagram butonu
+        document.getElementById('instagramBtn').addEventListener('click', function() {
+            window.open('https://www.instagram.com/kadirli_pasam_doner?igsh=dW1xZ245YWdxaW4y', '_blank');
+        });
+
+        // Harita butonu
+        document.getElementById('mapBtn').addEventListener('click', function() {
+            window.open('https://maps.app.goo.gl/kieU5MrRQvoMrtof7', '_blank');
+        });
+    </script>
+</body>
+</html>
