@@ -1,0 +1,22 @@
+{
+  "name": "Paşam Döner",
+  "short_name": "Paşam Döner",
+  "description": "Kadirli Paşam Döner - Erman Eren",
+  "start_url": "/d-mekan/u3.html",
+  "display": "standalone",
+  "background_color": "#0a0a2a",
+  "theme_color": "#0066ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "flor.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "flor.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
