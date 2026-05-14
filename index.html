@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2E7D32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PazarYo">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="pazar.jpg">
+    <title>PazarYo - Pazarcı Yönetim Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <h1>PazarYo</h1>
+            </div>
+            <div class="header-actions">
+                <button id="darkModeToggle" class="icon-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="notificationBtn" class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Dynamic pages will load here -->
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-item" data-page="products">
+                <i class="fas fa-apple-alt"></i>
+                <span>Ürünler</span>
+            </button>
+            <button class="nav-item" data-page="suppliers">
+                <i class="fas fa-truck"></i>
+                <span>Halciler</span>
+            </button>
+            <button class="nav-item" data-page="expenses">
+                <i class="fas fa-receipt"></i>
+                <span>Giderler</span>
+            </button>
+            <button class="nav-item" data-page="incomes">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Gelirler</span>
+            </button>
+            <button class="nav-item" data-page="reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Raporlar</span>
+            </button>
+            <button class="nav-item" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Ayarlar</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modalContainer" class="modal-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.log('Service Worker registration failed', err));
+        }
+    </script>
+</body>
+</html>
