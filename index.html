@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Sayfa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        #duyuruMetni {
+            font-size: 18px;
+            color: #555;
+            margin-top: 20px;
+            white-space: pre-wrap; /* Alt alta satır geçişlerini korur */
+            word-break: break-word;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Canlı Duyuru / Metin Ekranı</h1>
+        <div id="duyuruMetni">Yükleniyor...</div>
+    </div>
+
+    <!-- Firebase SDK'ları -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAlHpu2YvnpwyBj6JNLMZszh47Nuh3fU4",
+            authDomain: "test2-f67a3.firebaseapp.com",
+            projectId: "test2-f67a3",
+            storageBucket: "test2-f67a3.firebasestorage.app",
+            messagingSenderId: "374933004868",
+            appId: "1:374933004868:web:2b5f1d69c853aea3a3d211",
+            measurementId: "G-DSQ2GW6KT5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const duyuruDiv = document.getElementById("duyuruMetni");
+
+        // onSnapshot kullanarak veritabanındaki değişimi anlık (real-time) dinle
+        onSnapshot(doc(db, "icerik", "duyuru"), (docSnap) => {
+            if (docSnap.exists()) {
+                const veri = docSnap.data();
+                duyuruDiv.textContent = veri.metin || "Henüz bir metin girilmemiş.";
+            } else {
+                duyuruDiv.textContent = "Henüz bir içerik bulunamadı.";
+            }
+        }, (error) => {
+            console.error("Veri dinlenirken hata oluştu:", error);
+            duyuruDiv.textContent = "Bağlantı hatası oluştu.";
+        });
+    </script>
+</body>
+</html>
