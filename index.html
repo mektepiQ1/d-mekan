@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akıllı Yönlendirme Sistemi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #2c3e66;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            color: #2c3e66;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        p {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="spinner"></div>
+        <h2 id="statusText">Uygun sunucuya yönlendiriliyorsunuz...</h2>
+        <p>Lütfen bekleyin, sistem boş olan en uygun sayfayı sizin için buluyor.</p>
+    </div>
+
+    <!-- Firebase SDK ve Akıllı Yönlendirme Mantığı -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getDatabase, ref, get, runTransaction } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+        // Sizin Firebase Bilgileriniz (Güncellendi)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAikSxAo_DgqamAP7_dQejx2-FA9DJUcWY",
+            authDomain: "test-f5c31.firebaseapp.com",
+            databaseURL: "https://test-f5c31-default-rtdb.firebaseio.com/", // Realtime Database URL'iniz eklendi
+            projectId: "test-f5c31",
+            storageBucket: "test-f5c31.firebasestorage.app",
+            messagingSenderId: "561079659175",
+            appId: "1:561079659175:web:6439882e2dc4d56bbac982",
+            measurementId: "G-R7S5G9NQ7F"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        async function akilliYonlendir() {
+            const sitelerRef = ref(db, 'siteler');
+            const statusText = document.getElementById('statusText');
+            
+            try {
+                const snapshot = await get(sitelerRef);
+                
+                if (!snapshot.exists()) {
+                    statusText.textContent = "Sistemde henüz kayıtlı sunucu bulunamadı. Lütfen Firebase'e test verilerini ekleyin.";
+                    document.querySelector('.spinner').style.display = 'none';
+                    return;
+                }
+
+                const siteler = snapshot.val();
+                let uygunSiteKey = null;
+                let uygunSiteUrl = null;
+
+                for (const key in siteler) {
+                    const site = siteler[key];
+                    const aktif = site.aktif_kullanici || 0;
+                    const limit = site.limit || 10;
+
+                    if (aktif < limit) {
+                        uygunSiteKey = key;
+                        uygunSiteUrl = site.url;
+                        break;
+                    }
+                }
+
+                if (uygunSiteUrl && uygunSiteKey) {
+                    statusText.textContent = "Uygun sunucu bulundu, yönlendiriliyorsunuz...";
+                    
+                    const hedefSiteRef = ref(db, `siteler/${uygunSiteKey}/aktif_kullanici`);
+                    await runTransaction(hedefSiteRef, (currentVal) => {
+                        return (currentVal || 0) + 1;
+                    });
+
+                    window.location.href = uygunSiteUrl;
+                } else {
+                    statusText.textContent = "Şu anda tüm yönlendirme sayfaları dolu (10/10). Lütfen biraz sonra tekrar deneyin.";
+                    document.querySelector('.spinner').style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error("Yönlendirme hatası:", error);
+                statusText.textContent = "Bağlantı hatası oluştu. Lütfen Realtime Database'i aktif ettiğinizden emin olun.";
+                document.querySelector('.spinner').style.display = 'none';
+            }
+        }
+
+        window.onload = akilliYonlendir;
+    </script>
+</body>
+</html>
