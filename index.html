@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1b2d">
+<title>Randevu Al</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1b2d;--card:#16243a;--c2:#1c2d47;--line:#2b3f5c;--txt:#eee8da;--mut:#9fb0c6;--red:#d0392f;--red2:#e2574d;--err:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{font:16px/1.5 Barlow,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
+.pole{height:10px;background:repeating-linear-gradient(-45deg,var(--red) 0 14px,var(--txt) 14px 28px,#3a6ea5 28px 42px,var(--txt) 42px 56px)}
+.wrap{max-width:680px;margin:0 auto;padding:28px 16px calc(130px + env(safe-area-inset-bottom))}
+h1{font:700 clamp(34px,7vw,48px)/1.05 "Barlow Condensed",Impact,sans-serif;letter-spacing:.5px}
+header{margin-bottom:22px}header p{color:var(--mut);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.f{margin-bottom:20px}.f:last-child{margin-bottom:0}
+label,.lb{display:block;font-weight:600;font-size:15px;margin-bottom:8px}
+input{width:100%;height:54px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--c2);color:var(--txt);font:inherit;outline:0}
+input::placeholder{color:#6f84a0}
+input:focus,.d:focus-visible,.s:focus-visible,.go:focus-visible{border-color:var(--red2);box-shadow:0 0 0 3px #d0392f40;outline:0}
+input.bad{border-color:var(--err)}
+.er{color:var(--err);font-size:14px;min-height:20px;margin-top:4px}
+.dates{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:thin}
+.d{flex:0 0 auto;min-width:72px;padding:10px 8px;border-radius:10px;border:1px solid var(--line);background:var(--c2);color:var(--txt);cursor:pointer;font:inherit;line-height:1.25;text-align:center}
+.d small{display:block;color:var(--mut);font-size:13px}.d b{font:700 24px "Barlow Condensed",sans-serif}
+.d.on,.s.on{background:var(--red);border-color:var(--red);color:#fff}.d.on small{color:#ffd9d5}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(min-width:560px){.slots{grid-template-columns:repeat(4,1fr)}}
+.s{height:50px;border-radius:10px;border:1px solid var(--line);background:var(--c2);color:var(--txt);font:inherit;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s}
+.s:hover:not(:disabled):not(.on){border-color:var(--red2)}
+.s:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.hint{color:var(--mut);font-size:14px;margin-top:10px}
+.bar{position:fixed;inset:auto 0 0;background:#0f1b2df2;backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar>div{max-width:680px;margin:auto;display:flex;gap:14px;align-items:center}
+#sum{flex:1;color:var(--mut);font-size:14px;min-width:0}#sum b{display:block;color:var(--txt);font-size:16px}
+.go{height:54px;padding:0 28px;border:0;border-radius:10px;background:var(--red);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.go:disabled{opacity:.55;cursor:wait}.hide{display:none!important}
+#ok{text-align:center;padding:36px 20px}#ok .tick{width:64px;height:64px;border-radius:50%;background:var(--red);display:grid;place-items:center;margin:0 auto 16px;font-size:32px}
+#ok h2{font:700 32px "Barlow Condensed",sans-serif}#ok dl{margin:20px 0;display:grid;gap:6px}#ok dd{font-weight:600;font-size:18px}#ok dt{color:var(--mut);font-size:14px}
+.toast{position:fixed;top:calc(18px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:#3a1512;border:1px solid var(--red);color:#fff;padding:12px 18px;border-radius:10px;max-width:92vw;z-index:9}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="pole"></div>
+<div class="wrap">
+  <header><h1 id="biz">Randevu Al</h1><p>Bilgilerinizi girin, size uygun saati seçin.</p></header>
+  <main class="card" id="form">
+    <div class="f"><label for="n">Ad Soyad</label><input id="n" autocomplete="name" placeholder="Örn. Ahmet Yılmaz" maxlength="60"><div class="er" id="en"></div></div>
+    <div class="f"><label for="p">Telefon</label><input id="p" type="tel" inputmode="numeric" autocomplete="tel" placeholder="05XX XXX XX XX"><div class="er" id="ep"></div></div>
+    <div class="f"><span class="lb">Gün</span><div class="dates" id="dates"></div></div>
+    <div class="f"><span class="lb">Müsait saatler</span><div class="slots" id="slots"></div><div class="er" id="es"></div><p class="hint">Üstü çizili saatler dolu ya da geçmiş saatlerdir.</p></div>
+  </main>
+  <section class="card hide" id="ok" aria-live="polite">
+    <div class="tick">✓</div><h2>Randevunuz alındı</h2>
+    <dl><div><dt>Ad Soyad</dt><dd id="oa"></dd></div><div><dt>Tarih</dt><dd id="ot"></dd></div><div><dt>Saat</dt><dd id="os"></dd></div></dl>
+    <button class="go" id="again" type="button">Yeni randevu al</button>
+  </section>
+</div>
+<div class="bar" id="bar"><div><div id="sum">Saat seçilmedi</div><button class="go" id="send" type="button">Randevuyu onayla</button></div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {getDatabase,ref,onValue,update,serverTimestamp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+const app=initializeApp({apiKey:"AIzaSyDuJXgOqXZv4_V00CVMtP4lU04h0TZ8eec",authDomain:"berber-3178a.firebaseapp.com",databaseURL:"https://berber-3178a-default-rtdb.firebaseio.com",projectId:"berber-3178a",storageBucket:"berber-3178a.firebasestorage.app",messagingSenderId:"679070450020",appId:"1:679070450020:web:a5117fa3ccc4e0538ffa71"});
+const db=getDatabase(app),$=s=>document.querySelector(s);
+let cfg={isletmeAdi:"Randevu Al",acilis:"08:30",kapanis:"18:30",aralikDk:30,gunSayisi:14};
+let tarih=null,saat=null,dolu={},unsub=null,busy=false;
+const pad=n=>String(n).padStart(2,"0");
+const dkey=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dk=h=>{const [a,b]=h.split(":").map(Number);return a*60+b};
+const uzun=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"long"})};
+const saatler=()=>{const r=[];for(let m=dk(cfg.acilis);m<=dk(cfg.kapanis);m+=cfg.aralikDk)r.push(`${pad(Math.floor(m/60))}:${pad(m%60)}`);return r};
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;e.setAttribute("role","alert");document.body.append(e);setTimeout(()=>e.remove(),4500)}
+
+function renderDates(){
+  const box=$("#dates");box.innerHTML="";
+  for(let i=0;i<cfg.gunSayisi;i++){
+    const d=new Date();d.setDate(d.getDate()+i);const k=dkey(d);
+    const b=document.createElement("button");b.type="button";b.className="d"+(k===tarih?" on":"");
+    const g=i===0?"Bugün":i===1?"Yarın":d.toLocaleDateString("tr-TR",{weekday:"short"});
+    b.innerHTML=`<small>${g}</small><b>${d.getDate()}</b><small>${d.toLocaleDateString("tr-TR",{month:"short"})}</small>`;
+    b.onclick=()=>pick(k);box.append(b);
+  }
+}
+function pick(k){
+  tarih=k;saat=null;dolu={};renderDates();renderSlots();sum();
+  unsub&&unsub();
+  unsub=onValue(ref(db,"dolu/"+k),s=>{
+    dolu=s.val()||{};
+    if(saat&&dolu[saat]){saat=null;toast("Seçtiğiniz saat az önce doldu. Lütfen başka bir saat seçin.")}
+    renderSlots();sum();
+  },e=>{console.error(e);toast("Saatler yüklenemedi. Bağlantınızı kontrol edip sayfayı yenileyin.")});
+}
+function renderSlots(){
+  const box=$("#slots");box.innerHTML="";const now=new Date(),bugun=tarih===dkey(now),nm=now.getHours()*60+now.getMinutes();
+  saatler().forEach(h=>{
+    const b=document.createElement("button");b.type="button";b.textContent=h;
+    b.className="s"+(h===saat?" on":"");b.disabled=!!dolu[h]||(bugun&&dk(h)<=nm);
+    b.setAttribute("aria-pressed",h===saat);
+    b.onclick=()=>{saat=h;$("#es").textContent="";renderSlots();sum()};box.append(b);
+  });
+}
+function sum(){$("#sum").innerHTML=saat?`<b>${saat}</b>${uzun(tarih)}`:"Saat seçilmedi"}
+
+$("#p").addEventListener("input",e=>{
+  const d=e.target.value.replace(/\D/g,"").slice(0,11);
+  e.target.value=[d.slice(0,4),d.slice(4,7),d.slice(7,9),d.slice(9,11)].filter(Boolean).join(" ");
+});
+function normPhone(v){let d=v.replace(/\D/g,"");if(d.length===10&&d[0]==="5")d="0"+d;return /^05\d{9}$/.test(d)?d:null}
+
+$("#send").onclick=async()=>{
+  if(busy)return;
+  const ad=$("#n").value.trim().replace(/\s+/g," "),tel=normPhone($("#p").value);
+  let ok=true;
+  const bad=(i,e,m)=>{$(i).classList.toggle("bad",!!m);$(e).textContent=m||""; if(m)ok=false};
+  bad("#n","#en",/^[\p{L}.'-]{2,}(\s[\p{L}.'-]{2,})+$/u.test(ad)&&ad.length<=60?"":"Lütfen adınızı ve soyadınızı yazın.");
+  bad("#p","#ep",tel?"":"Geçerli bir cep telefonu girin (05XX XXX XX XX).");
+  $("#es").textContent=tarih&&saat?"":(ok=false,"Lütfen bir saat seçin.");
+  if(!ok)return;
+  if(!navigator.onLine)return toast("İnternet bağlantınız yok.");
+  busy=true;const btn=$("#send");btn.disabled=true;btn.textContent="Kaydediliyor…";
+  try{
+    const w=update(ref(db),{[`dolu/${tarih}/${saat}`]:true,[`randevular/${tarih}/${saat}`]:{ad,telefon:tel,tarih,saat,olusturma:serverTimestamp()}});
+    await Promise.race([w,new Promise((_,r)=>setTimeout(()=>r({code:"TIMEOUT"}),15000))]);
+    $("#oa").textContent=ad;$("#ot").textContent=uzun(tarih);$("#os").textContent=saat;
+    $("#form").classList.add("hide");$("#bar").classList.add("hide");$("#ok").classList.remove("hide");scrollTo(0,0);
+  }catch(e){
+    console.error(e);
+    toast(e.code==="TIMEOUT"?"Bağlantı zayıf, randevu doğrulanamadı. Lütfen tekrar deneyin.":"Bu saat az önce alınmış olabilir. Lütfen başka bir saat seçin.");
+  }
+  busy=false;btn.disabled=false;btn.textContent="Randevuyu onayla";
+};
+$("#again").onclick=()=>{
+  $("#n").value="";$("#p").value="";saat=null;
+  $("#ok").classList.add("hide");$("#form").classList.remove("hide");$("#bar").classList.remove("hide");renderSlots();sum();
+};
+
+renderDates();
+onValue(ref(db,"ayarlar"),s=>{
+  const v=s.val();if(v)cfg={...cfg,...v};
+  $("#biz").textContent=cfg.isletmeAdi;document.title=cfg.isletmeAdi+" | Randevu";
+  renderDates();if(!tarih)pick(dkey(new Date()));else renderSlots();
+},()=>{if(!tarih)pick(dkey(new Date()))});
+setInterval(()=>tarih&&renderSlots(),60000);
+</script>
+</body>
+</html>

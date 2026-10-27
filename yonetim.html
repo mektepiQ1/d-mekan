@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f1b2d">
+<title>Randevu Yönetimi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1b2d;--card:#16243a;--c2:#1c2d47;--line:#2b3f5c;--txt:#eee8da;--mut:#9fb0c6;--red:#d0392f;--red2:#e2574d;--ok:#4cc38a;--err:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{font:16px/1.5 Barlow,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh}
+.pole{height:10px;background:repeating-linear-gradient(-45deg,var(--red) 0 14px,var(--txt) 14px 28px,#3a6ea5 28px 42px,var(--txt) 42px 56px)}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px calc(40px + env(safe-area-inset-bottom))}
+h1{font:700 clamp(30px,6vw,42px)/1.05 "Barlow Condensed",Impact,sans-serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.hide{display:none!important}
+input{width:100%;height:52px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--c2);color:var(--txt);font:inherit;outline:0;margin-bottom:12px}
+input:focus,button:focus-visible,a:focus-visible{box-shadow:0 0 0 3px #d0392f50;outline:0}
+button,.btn{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--c2);color:var(--txt);font:inherit;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;gap:6px}
+.pri{background:var(--red);border-color:var(--red);color:#fff;width:100%;height:52px}
+#login{max-width:420px;margin:12vh auto 0}#login h1{margin-bottom:6px}#login p{color:var(--mut);margin-bottom:18px}
+.er{color:var(--err);min-height:22px;margin-bottom:8px;font-size:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:14px}.live i{width:10px;height:10px;border-radius:50%;background:var(--err)}.live.on i{background:var(--ok)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat b{display:block;font:700 34px/1.1 "Barlow Condensed",sans-serif}.stat span{color:var(--mut);font-size:14px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button.on{background:var(--red);border-color:var(--red);color:#fff}
+.banner{background:#3a2a12;border:1px solid #8a6a2a;padding:12px 16px;border-radius:10px;margin-bottom:14px;cursor:pointer}
+h2{font:600 20px "Barlow Condensed",sans-serif;letter-spacing:.3px;margin:18px 0 8px;color:var(--mut)}
+.list{display:grid;gap:10px;grid-template-columns:1fr}
+@media(min-width:700px){.list{grid-template-columns:1fr 1fr}}
+.a{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;transition:background .4s}
+.a.new{background:#3a1d22;border-color:var(--red)}.a.past{opacity:.5}
+.t{font:700 34px/1 "Barlow Condensed",sans-serif;grid-row:span 2}
+.nm{font-weight:600;overflow-wrap:anywhere}.tel{color:var(--mut)}
+.act{grid-column:1/-1;display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.act>*{flex:1;min-width:90px}
+.del{color:var(--err)}
+.empty{text-align:center;color:var(--mut);padding:36px 0}
+.toast{position:fixed;top:calc(16px + env(safe-area-inset-top));right:16px;left:16px;max-width:420px;margin-left:auto;background:#3a1512;border:1px solid var(--red);padding:14px 16px;border-radius:10px;z-index:9}
+dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:380px;width:calc(100% - 32px)}
+dialog::backdrop{background:#000a}dialog p{margin-bottom:16px}dialog .act{margin:0}
+</style>
+</head>
+<body>
+<div class="pole"></div>
+<div class="wrap">
+  <form class="card" id="login" novalidate>
+    <h1>Yönetim girişi</h1><p>Randevuları görmek için giriş yapın.</p>
+    <input id="em" type="email" autocomplete="username" placeholder="E-posta" required>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Şifre" required>
+    <div class="er" id="le" role="alert"></div>
+    <button class="pri" id="lb" type="submit">Giriş yap</button>
+  </form>
+
+  <div id="app" class="hide">
+    <div class="top"><h1 id="biz">Randevular</h1>
+      <div class="tools"><span class="live" id="live"><i></i><span>Bağlanıyor</span></span>
+      <button id="snd" type="button">Ses: açık</button><button id="out" type="button">Çıkış yap</button></div></div>
+    <div class="banner hide" id="unlock">Sesli bildirimi etkinleştirmek için buraya dokunun.</div>
+    <div class="stats"><div class="card stat"><b id="s1">0</b><span>Bugün</span></div><div class="card stat"><b id="s2">0</b><span>Yaklaşan toplam</span></div><div class="card stat"><b id="s3">-</b><span>Sıradaki</span></div></div>
+    <div class="tabs"><button class="on" data-f="bugun" type="button">Bugün</button><button data-f="hepsi" type="button">Tüm yaklaşanlar</button></div>
+    <div id="out2"></div>
+  </div>
+</div>
+<dialog id="dlg"><p id="dp"></p><div class="act"><button id="dn" type="button">Vazgeç</button><button id="dy" class="del" type="button">Randevuyu iptal et</button></div></dialog>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {getDatabase,ref,query,orderByKey,startAt,onValue,update} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+const app=initializeApp({apiKey:"AIzaSyDuJXgOqXZv4_V00CVMtP4lU04h0TZ8eec",authDomain:"berber-3178a.firebaseapp.com",databaseURL:"https://berber-3178a-default-rtdb.firebaseio.com",projectId:"berber-3178a",storageBucket:"berber-3178a.firebasestorage.app",messagingSenderId:"679070450020",appId:"1:679070450020:web:a5117fa3ccc4e0538ffa71"});
+const auth=getAuth(app),db=getDatabase(app),$=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0"),dkey=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dt=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)};
+let items=[],seen=null,filt="bugun",unsubs=[],fresh=new Set(),unread=0,ctx=null,sesAcik=localStorage.getItem("ses")!=="0";
+
+/* ---- Ses ---- */
+function audioOk(){return ctx&&ctx.state==="running"}
+function unlock(){
+  try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();ctx.resume&&ctx.resume()}catch(e){}
+  $("#unlock").classList.toggle("hide",audioOk()||!sesAcik);
+}
+["pointerdown","keydown"].forEach(e=>document.addEventListener(e,unlock));
+function beep(){
+  if(!sesAcik||!audioOk())return;
+  [[880,0],[1175,.22],[880,.44]].forEach(([f,t])=>{
+    const o=ctx.createOscillator(),g=ctx.createGain(),s=ctx.currentTime+t;
+    o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(.35,s+.02);g.gain.exponentialRampToValueAtTime(.001,s+.2);
+    o.connect(g).connect(ctx.destination);o.start(s);o.stop(s+.22);
+  });
+}
+function sndLabel(){$("#snd").textContent="Ses: "+(sesAcik?"açık":"kapalı");$("#unlock").classList.toggle("hide",audioOk()||!sesAcik)}
+$("#snd").onclick=()=>{sesAcik=!sesAcik;localStorage.setItem("ses",sesAcik?"1":"0");unlock();sndLabel();if(sesAcik)beep()};
+$("#unlock").onclick=()=>{unlock();setTimeout(()=>{sndLabel();beep()},50)};
+
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;e.setAttribute("role","alert");document.body.append(e);setTimeout(()=>e.remove(),7000)}
+window.addEventListener("focus",()=>{unread=0;document.title="Randevu Yönetimi"});
+
+/* ---- Giriş ---- */
+$("#login").onsubmit=async e=>{
+  e.preventDefault();const b=$("#lb");b.disabled=true;b.textContent="Giriş yapılıyor…";$("#le").textContent="";unlock();
+  try{await signInWithEmailAndPassword(auth,$("#em").value.trim(),$("#pw").value)}
+  catch(x){
+    const m={"auth/invalid-credential":"E-posta veya şifre hatalı.","auth/invalid-email":"E-posta adresi geçersiz.","auth/too-many-requests":"Çok fazla deneme yapıldı. Bir süre sonra tekrar deneyin.","auth/network-request-failed":"İnternet bağlantısı yok.","auth/operation-not-allowed":"Firebase'de e-posta/şifre girişi etkin değil."};
+    $("#le").textContent=m[x.code]||"Giriş yapılamadı: "+x.code;
+  }
+  b.disabled=false;b.textContent="Giriş yap";
+};
+$("#out").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{
+  unsubs.forEach(f=>f());unsubs=[];items=[];seen=null;
+  $("#login").classList.toggle("hide",!!u);$("#app").classList.toggle("hide",!u);
+  if(!u)return;
+  sndLabel();
+  unsubs.push(onValue(ref(db,".info/connected"),s=>{const on=!!s.val();$("#live").classList.toggle("on",on);$("#live span").textContent=on?"Canlı":"Bağlantı yok"}));
+  unsubs.push(onValue(ref(db,"ayarlar/isletmeAdi"),s=>{if(s.val())$("#biz").textContent=s.val()+" · Randevular"}));
+  unsubs.push(onValue(query(ref(db,"randevular"),orderByKey(),startAt(dkey(new Date()))),snap=>{
+    const l=[];snap.forEach(d=>{d.forEach(s=>{l.push({...s.val(),key:d.key+"/"+s.key,t:d.key,h:s.key})})});
+    l.sort((a,b)=>(a.t+a.h).localeCompare(b.t+b.h));
+    if(seen){
+      const yeni=l.filter(x=>!seen.has(x.key));
+      if(yeni.length){
+        yeni.forEach(x=>{fresh.add(x.key);setTimeout(()=>{fresh.delete(x.key);render()},10000)});
+        beep();const x=yeni[0];
+        toast(`Yeni randevu: ${x.ad} · ${x.h} · ${dt(x.t).toLocaleDateString("tr-TR",{day:"numeric",month:"long"})}`+(yeni.length>1?` (+${yeni.length-1})`:""));
+        if(!document.hasFocus()){unread+=yeni.length;document.title=`(${unread}) Yeni randevu`}
+      }
+    }
+    seen=new Set(l.map(x=>x.key));items=l;render();
+  },err=>{console.error(err);toast("Randevular okunamadı. Veritabanı kurallarını ve giriş yetkisini kontrol edin.")}));
+});
+
+/* ---- Liste ---- */
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{filt=b.dataset.f;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));render()});
+function etiket(k){const t=dkey(new Date()),y=new Date();y.setDate(y.getDate()+1);const g=dt(k).toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"long"});return k===t?"Bugün · "+g:k===dkey(y)?"Yarın · "+g:g}
+function render(){
+  const now=new Date(),bk=dkey(now),nm=pad(now.getHours())+":"+pad(now.getMinutes());
+  const bugun=items.filter(x=>x.t===bk),sira=bugun.find(x=>x.h>=nm);
+  $("#s1").textContent=bugun.length;$("#s2").textContent=items.length;$("#s3").textContent=sira?sira.h:"-";
+  const list=filt==="bugun"?bugun:items;
+  if(!list.length){$("#out2").innerHTML=`<div class="empty">${filt==="bugun"?"Bugün için randevu yok.":"Yaklaşan randevu yok."}</div>`;return}
+  let html="",son="";
+  list.forEach(x=>{
+    if(x.t!==son){son=x.t;html+=`<h2>${esc(etiket(x.t))}</h2><div class="list">`.replace(/^/,html?"</div>":"")}
+    const gecti=x.t===bk&&x.h<nm;
+    html+=`<div class="card a${fresh.has(x.key)?" new":""}${gecti?" past":""}"><div class="t">${esc(x.h)}</div><div class="nm">${esc(x.ad)}</div><div class="tel">${esc(x.telefon)}</div>
+    <div class="act"><a class="btn" href="tel:${esc(x.telefon)}">Ara</a><a class="btn" target="_blank" rel="noopener" href="https://wa.me/90${esc(String(x.telefon).slice(1))}">WhatsApp</a><button class="del" data-k="${esc(x.key)}" type="button">İptal et</button></div></div>`;
+  });
+  $("#out2").innerHTML=html+"</div>";
+  $("#out2").querySelectorAll(".del").forEach(b=>b.onclick=()=>iptal(b.dataset.k));
+}
+function iptal(k){
+  const x=items.find(i=>i.key===k);if(!x)return;
+  $("#dp").textContent=`${x.ad} adlı müşterinin ${x.h} randevusu iptal edilecek. Saat yeniden müsait olacak.`;
+  $("#dlg").showModal();$("#dn").onclick=()=>$("#dlg").close();
+  $("#dy").onclick=async()=>{
+    try{await update(ref(db),{[`dolu/${x.t}/${x.h}`]:null,[`randevular/${x.t}/${x.h}`]:null});$("#dlg").close()}
+    catch(e){console.error(e);$("#dlg").close();toast("İptal edilemedi. Tekrar deneyin.")}
+  };
+}
+setInterval(()=>items.length&&render(),60000);
+</script>
+</body>
+</html>
