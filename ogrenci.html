@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e66">
+<meta name="robots" content="noindex, nofollow">
+<title>Öğrenci Paneli | Öğrenci Bahçesi</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌱%3C/text%3E%3C/svg%3E">
+<style>
+:root{--navy:#2c3e66;--navy-d:#1a2744;--text:#2d3748;--muted:#718096;--line:#e2e8f0;--soft:#f7fafc;--danger:#c53030;--ok:#276749;--grad:linear-gradient(135deg,var(--navy),var(--navy-d))}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:linear-gradient(135deg,#f5f7fa,#c3cfe2) fixed;min-height:100vh;color:var(--text);overflow-wrap:anywhere;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.main{max-width:900px;margin:0 auto;padding:32px 24px}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:clamp(1.5rem,1.1rem + 1.8vw,2.2rem);color:var(--navy);margin-bottom:8px}
+.header p{color:var(--muted)}
+.card{background:rgba(255,255,255,.98);border-radius:20px;padding:32px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin-bottom:32px}
+.card h2{margin-bottom:24px;font-size:1.5em;border-left:3px solid var(--navy);padding-left:16px}
+.form-card{max-width:480px;margin:0 auto 32px;text-align:center}
+.form-card h2{border:0;padding:0;color:var(--navy);margin-bottom:8px}
+.form-card .sub-t{color:var(--muted);font-size:14px;margin-bottom:24px}
+.fg{margin-bottom:20px;text-align:left}
+label{display:block;margin-bottom:8px;color:#4a5568;font-weight:500;font-size:14px}
+input,select{width:100%;padding:12px 16px;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;font:inherit;font-size:16px}
+input:focus,select:focus{outline:0;border-color:var(--navy);box-shadow:0 0 0 3px rgba(44,62,102,.1);background:#fff}
+button{width:100%;padding:12px 28px;background:var(--grad);color:#fff;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:500;cursor:pointer}
+button:hover{opacity:.95}
+button.gray{background:var(--line);color:#4a5568;margin-top:12px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.alert{padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:500}
+.er{background:#fff5f5;color:var(--danger);border:1px solid #feb2b2}
+.empty{text-align:center;padding:48px 24px;color:#a0aec0;background:var(--soft);border-radius:16px}
+.wel{background:var(--grad);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.out{width:auto;padding:10px 20px;background:#edf2f7;color:#4a5568;border:1px solid var(--line);font-size:14px;font-weight:600}
+.navbar{background:#fff;border-radius:16px;margin-bottom:28px;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden}
+.nl{display:flex;list-style:none}
+.nl li{flex:1;text-align:center}
+.nl a{display:block;padding:16px 12px;color:#4a5568;font-weight:600;font-size:15px;text-decoration:none;border-bottom:3px solid transparent;cursor:pointer}
+.nl a:hover,.nl a.active{color:var(--navy);border-color:var(--navy);background:rgba(44,62,102,.05)}
+.class-card{background:var(--grad);color:#fff;padding:24px;border-radius:20px;margin-bottom:24px;text-align:center}
+.class-card h3{font-size:22px;margin-bottom:8px}
+.class-card p{opacity:.85;font-size:13px}
+.lbl{color:#4a5568;font-weight:600;margin:24px 0 16px}
+.slesson{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--soft);padding:16px 20px;margin:10px 0;border-radius:14px;border-left:4px solid var(--navy);font-weight:600}
+.btn{display:inline-block;padding:8px 18px;color:var(--navy);background:#fff;border:1.5px solid var(--navy);border-radius:20px;text-decoration:none;font-size:13px;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--navy);color:#fff}
+.warn{background:#fff5f5;color:var(--danger);padding:18px;border-radius:14px;text-align:center;border:1px solid #feb2b2}
+.opt{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-top:8px;background:#fff;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;font-size:15px}
+.opt:hover{border-color:var(--navy)}
+.opt input{width:auto;margin:0;flex:none}
+.opt.correct{background:#f0fff4;border-color:#9ae6b4}
+.opt.wrong{background:#fff5f5;border-color:#feb2b2}
+@media(max-width:768px){
+.main{padding:24px 12px}
+.card{padding:20px}
+.top{flex-direction:column;align-items:stretch}
+.out{width:100%;padding:12px}
+.nl{flex-direction:column}
+.nl a{text-align:left;border-bottom:1px solid #edf2f7;border-left:4px solid transparent}
+.nl a:hover,.nl a.active{border-left-color:var(--navy);border-bottom-color:#edf2f7}
+.slesson{flex-direction:column;align-items:flex-start}
+.btn{width:100%;text-align:center;padding:10px}
+}
+@media(max-width:400px){.card{padding:16px;border-radius:16px}.main{padding:16px 10px}}
+</style>
+</head>
+<body>
+<main class="main">
+  <div class="header"><h1>Öğrenci Bahçesi</h1><p>Dersler, Defter ve Online Sınavlar</p></div>
+  <div id="app"><div class="card" style="text-align:center">Yükleniyor…</div></div>
+</main>
+
+<script type="module">
+'use strict';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBc0CMtxvo2VMLGcrmnxHqfVV9AtzI4LyA",
+  authDomain: "ogrenci-ff085.firebaseapp.com",
+  databaseURL: "https://ogrenci-ff085-default-rtdb.firebaseio.com",
+  projectId: "ogrenci-ff085",
+  storageBucket: "ogrenci-ff085.firebasestorage.app",
+  messagingSenderId: "300504744285",
+  appId: "1:300504744285:web:041551e1e4dd81775ea8b4"
+};
+
+const LINKS = [
+  ['Ders Programım', 'https://mektepiq1.github.io/cay/dersprogram.html'],
+  ['Defter', 'https://mektepiq1.github.io/cay/cizgilideff.html'],
+  ['Deneme', 'https://denemelerburda.infinityfreeapp.com/soru.php']
+];
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const fb = initializeApp(firebaseConfig);
+const auth = getAuth(fb);
+const db = getDatabase(fb);
+
+const U = {
+  esc: s => String(s == null ? '' : s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';'),
+  now: () => new Date().toISOString(),
+  fd(iso, withTime = true) {
+    if (!iso) return '-';
+    const d = new Date(iso), p = n => String(n).padStart(2, '0');
+    const date = `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`;
+    return withTime ? `${date} ${p(d.getHours())}:${p(d.getMinutes())}` : date;
+  },
+  norm: s => String(s).toLocaleLowerCase('tr').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ı/g, 'i').trim(),
+  matchClass(classes, exam, edu) {
+    const has = (name, term) => !!term &&
+      new RegExp('(^|[^a-z0-9])' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-z0-9])').test(name);
+    const e = U.norm(exam), l = U.norm(edu);
+    let best, top = 0;
+    for (const c of classes) {
+      const n = U.norm(c.class_name), score = (has(n, e) ? 2 : 0) + (has(n, l) ? 1 : 0);
+      if (score > top) { best = c; top = score; }
+    }
+    return best;
+  }
+};
+const { esc, now, fd, matchClass } = U;
+
+const app = document.getElementById('app');
+let user = null;
+let profile = null;
+let error = '';
+let lastEmail = '';
+const state = { tab: 'lessons', quizzes: [], results: {}, activeQuiz: null, answers: [] };
+
+const errorHtml = () => { const e = error; error = ''; return e ? `<div class="alert er">${esc(e)}</div>` : ''; };
+
+const loginView = () => `
+  <div class="card form-card">
+    <h2>Hoş Geldiniz</h2>
+    <p class="sub-t">E-posta ve şifrenizle giriş yapın</p>
+    ${errorHtml()}
+    <form data-f="login">
+      <div class="fg"><label>E-posta</label>
+        <input name="email" type="email" required autocomplete="username" value="${esc(lastEmail)}"></div>
+      <div class="fg"><label>Şifre</label>
+        <input name="pw" type="password" required autocomplete="current-password"></div>
+      <button>Giriş Yap</button>
+    </form>
+  </div>`;
+
+const welcome = () => `
+  <div class="top">
+    <div class="wel">Hoş Geldin, ${esc(profile?.username || user?.email || '')}!</div>
+    <button class="out" data-a="logout">Çıkış Yap</button>
+  </div>`;
+
+const optionTags = list => list.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+
+const profileView = (opts) => `
+  <div class="card">${welcome()}
+    <div class="card form-card" style="box-shadow:none;border:1px solid var(--line)">
+      <h2>Profilinizi Tamamlayın</h2>
+      <p class="sub-t">Sistemi kullanabilmeniz için bilgilerinizi güncelleyin.</p>
+      ${errorHtml()}` +
+      (opts.exam.length && opts.edu.length ? `
+      <form data-f="profile">
+        <div class="fg"><label>Sınav Türü</label>
+          <select name="exam" required><option value="">-- Seçiniz --</option>${optionTags(opts.exam)}</select></div>
+        <div class="fg"><label>Öğrenim Düzeyi</label>
+          <select name="education_status" required><option value="">-- Seçiniz --</option>${optionTags(opts.edu)}</select></div>
+        <button>Kaydet ve Devam Et</button>
+      </form>` : `
+      <div class="warn"><p>Seçenek listeleri henüz hazırlanmamış.</p><p>Yöneticinizle iletişime geçin.</p></div>`) + `
+    </div>
+  </div>`;
+
+const lessonsTab = (cls, lessons) => `
+  <h2 style="margin-bottom:20px">Sınıfım ve Derslerim</h2>` +
+  (cls ? `
+    <div class="class-card"><h3>${esc(cls.class_name)}</h3>
+      <p>Kayıt: ${fd(cls.created_at, false)}</p></div>
+    <div class="lbl">Derslerim:</div>` +
+    (lessons.length ? lessons.map(l => `
+      <div class="slesson"><span>${esc(l.lesson_name)}</span>
+        ${l.link_url ? `<a class="btn" href="${esc(l.link_url)}" target="_blank" rel="noopener noreferrer">İncele</a>` : ''}</div>`).join('')
+      : '<div class="empty"><p>Bu sınıfa henüz ders eklenmemiş.</p></div>')
+    : `<div class="warn"><p>Henüz size bir sınıf atanmamış.</p><p>Yöneticinizle iletişime geçin.</p></div>`);
+
+const quizzesTab = (quizzes, results) => `
+  <h2 style="margin-bottom:20px">Sınavlarım</h2>` +
+  (quizzes.length ? quizzes.map(q => {
+    const r = results[q.id];
+    return `<div class="slesson">
+      <span>${esc(q.title)}
+        <small style="display:block;font-weight:400;color:var(--muted)">
+          ${esc(q.exam_type)} · ${esc(q.education_status)} · ${q.questions.length} soru
+          ${r ? ` · Sonuç: <b>${r.score}/${r.total}</b>` : ''}</small></span>
+      ${r
+        ? `<button class="btn" data-a="viewResult" data-id="${q.id}">Sonucu Gör</button>`
+        : `<button class="btn" data-a="startQuiz" data-id="${q.id}">Sınavı Çöz</button>`}
+    </div>`;
+  }).join('')
+  : '<div class="empty"><p>Size uygun sınav yok.</p><p>Yönetici sınav eklediğinde burada görünür.</p></div>');
+
+const panelView = (cls, lessons, quizzes, results) => {
+  const tab = state.tab || 'lessons';
+  return `
+  <div class="card">${welcome()}
+    <nav class="navbar" aria-label="Öğrenci menüsü"><ul class="nl">
+      <li><a class="${tab === 'lessons' ? 'active' : ''}" data-a="tab" data-tab="lessons">Sınıfım ve Derslerim</a></li>
+      <li><a class="${tab === 'quizzes' ? 'active' : ''}" data-a="tab" data-tab="quizzes">Sınavlarım</a></li>
+      ${LINKS.map(([t, u]) => `<li><a href="${u}">${t}</a></li>`).join('')}
+    </ul></nav>
+    ${tab === 'lessons' ? lessonsTab(cls, lessons) : quizzesTab(quizzes, results)}
+  </div>`;
+};
+
+function renderQuiz() {
+  const q = state.activeQuiz;
+  if (!q) return render();
+  const answered = state.answers.filter(x => x >= 0).length;
+  app.innerHTML = `<div class="card">
+    <div class="top">
+      <div class="wel">${esc(q.title)}</div>
+      <button class="out" data-a="cancelQuiz">Vazgeç</button></div>
+    <p class="hint" style="margin-bottom:16px">${answered} / ${q.questions.length} cevaplandı</p>
+    ${q.questions.map((s, i) => `
+      <div class="item">
+        <strong>${i + 1}. ${esc(s.text)}</strong>
+        ${s.options.map((o, j) => `
+          <label class="opt${state.answers[i] === j ? ' correct' : ''}">
+            <input type="radio" name="q${i}" value="${j}"
+              ${state.answers[i] === j ? 'checked' : ''}
+              data-a="answer" data-q="${i}" data-v="${j}">
+            <span>${esc(o)}</span>
+          </label>`).join('')}
+      </div>`).join('')}
+    <button data-a="submitQuiz">Sınavı Bitir</button>
+  </div>`;
+}
+
+async function render() {
+  if (!user) { app.innerHTML = loginView(); return; }
+  try {
+    const snap = await get(ref(db, 'users/' + user.uid));
+    profile = snap.exists() ? { id: user.uid, ...snap.val() } : null;
+  } catch (e) {
+    app.innerHTML = `<div class="alert er">Profil yüklenemedi: ${esc(e.message)}</div>`;
+    return;
+  }
+  if (!profile) {
+    app.innerHTML = `<div class="card form-card"><h2>Kayıt Bulunamadı</h2>
+      <p class="sub-t">Bu hesap için veritabanında kayıt yok. Yöneticinizle iletişime geçin.</p>
+      <button class="gray" data-a="logout">Çıkış Yap</button></div>`;
+    return;
+  }
+  if (!profile.exam || !profile.education_status) {
+    const optSnap = await get(ref(db, 'options'));
+    const all = Object.values(optSnap.val() || {});
+    const by = t => all.filter(o => o.type === t).map(o => o.label);
+    app.innerHTML = profileView({ exam: by('exam'), edu: by('edu') });
+    return;
+  }
+  const [cSnap, lSnap, qSnap, rSnap] = await Promise.all([
+    get(ref(db, 'classes')), get(ref(db, 'lessons')),
+    get(ref(db, 'quizzes')), get(ref(db, 'results/' + user.uid))
+  ]);
+  const classes = Object.entries(cSnap.val() || {}).map(([id, o]) => ({ id, ...o }));
+  const lessons = Object.entries(lSnap.val() || {}).map(([id, o]) => ({ id, ...o }));
+  const allQuizzes = Object.entries(qSnap.val() || {}).map(([id, o]) => ({ id, ...o }))
+    .filter(q => q.exam_type === profile.exam && q.education_status === profile.education_status)
+    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  const results = rSnap.val() || {};
+  state.quizzes = allQuizzes;
+  state.results = results;
+  const cls = classes.find(c => c.id === profile.class_id);
+  app.innerHTML = panelView(cls, cls ? lessons.filter(l => l.class_id === cls.id) : [], allQuizzes, results);
+}
+
+const forms = {
+  async login(d) {
+    try {
+      await signInWithEmailAndPassword(auth, d.get('email').trim(), d.get('pw'));
+    } catch (e) {
+      error = 'Giriş başarısız: ' + (e.code || e.message);
+      lastEmail = d.get('email').trim();
+      render();
+    }
+  },
+  async profile(d) {
+    const exam = d.get('exam'), edu = d.get('education_status');
+    if (!exam || !edu) { error = 'Tüm alanları doldurun.'; return render(); }
+    const cSnap = await get(ref(db, 'classes'));
+    const classes = Object.entries(cSnap.val() || {}).map(([id, o]) => ({ id, ...o }));
+    const match = matchClass(classes, exam, edu);
+    await update(ref(db, 'users/' + user.uid), {
+      exam, education_status: edu, class_id: match ? match.id : (profile.class_id || null)
+    });
+  }
+};
+
+app.addEventListener('submit', async e => {
+  e.preventDefault();
+  const fn = forms[e.target.dataset.f];
+  if (!fn) return;
+  try { await fn(new FormData(e.target)); }
+  catch (err) { error = 'İşlem hatası: ' + err.message; }
+  render();
+});
+
+app.addEventListener('click', async e => {
+  const el = e.target.closest('[data-a]');
+  if (!el) return;
+  const a = el.dataset.a;
+
+  if (a === 'logout') { await signOut(auth); return; }
+
+  if (a === 'tab') {
+    e.preventDefault();
+    state.tab = el.dataset.tab;
+    return render();
+  }
+
+  if (a === 'startQuiz') {
+    const q = state.quizzes.find(x => x.id === el.dataset.id);
+    if (!q) return;
+    state.activeQuiz = q;
+    state.answers = new Array(q.questions.length).fill(-1);
+    return renderQuiz();
+  }
+
+  if (a === 'cancelQuiz') {
+    if (!confirm('Sınavdan çıkmak istediğinize emin misiniz? Cevaplar kaydedilmez.')) return;
+    state.activeQuiz = null;
+    state.answers = [];
+    return render();
+  }
+
+  if (a === 'answer') {
+    const i = +el.dataset.q, v = +el.dataset.v;
+    state.answers[i] = v;
+    // Tüm opt'ları yeniden çiz
+    const container = el.closest('.item');
+    container.querySelectorAll('.opt').forEach((opt, j) => {
+      opt.classList.toggle('correct', j === v);
+      const inp = opt.querySelector('input');
+      if (inp) inp.checked = (j === v);
+    });
+    const hint = app.querySelector('.hint');
+    if (hint) hint.textContent = state.answers.filter(x => x >= 0).length + ' / ' + state.activeQuiz.questions.length + ' cevaplandı';
+    return;
+  }
+
+  if (a === 'submitQuiz') {
+    if (state.answers.some(x => x < 0)) return alert('Lütfen tüm soruları cevaplayın.');
+    const q = state.activeQuiz;
+    const score = state.answers.reduce((s, ans, i) => s + (ans === q.questions[i].correct ? 1 : 0), 0);
+    try {
+      await set(ref(db, 'results/' + user.uid + '/' + q.id), {
+        score, total: q.questions.length, answers: state.answers, at: now()
+      });
+    } catch (err) {
+      return alert('Sonuç kaydedilemedi: ' + err.message);
+    }
+    state.activeQuiz = null;
+    state.answers = [];
+    state.tab = 'quizzes';
+    return render();
+  }
+
+  if (a === 'viewResult') {
+    const q = state.quizzes.find(x => x.id === el.dataset.id);
+    const r = state.results[el.dataset.id];
+    if (!q || !r) return;
+    app.innerHTML = `<div class="card">
+      <div class="top"><div class="wel">${esc(q.title)}</div>
+        <button class="out" data-a="tab" data-tab="quizzes">Geri</button></div>
+      <div class="class-card"><h3>${r.score} / ${r.total}</h3>
+        <p>Doğru: ${r.score} · Tarih: ${fd(r.at)}</p></div>
+      ${q.questions.map((s, i) => {
+        const given = (r.answers || [])[i];
+        const isCorrect = given === s.correct;
+        return `<div class="item" style="border-left-color:${isCorrect ? 'var(--ok)' : 'var(--danger)'}">
+          <strong>${i + 1}. ${esc(s.text)}</strong>
+          <div style="margin-top:10px;font-size:14px">
+            ${s.options.map((o, j) => {
+              let cls = 'opt';
+              if (j === s.correct) cls += ' correct';
+              else if (j === given) cls += ' wrong';
+              const tag = j === s.correct ? ' ✅' : (j === given ? ' ❌' : '');
+              return `<div class="${cls}" style="cursor:default"><span>${esc(o)}${tag}</span></div>`;
+            }).join('')}
+          </div></div>`;
+      }).join('')}
+    </div>`;
+    return;
+  }
+});
+
+onAuthStateChanged(auth, u => {
+  user = u;
+  if (!u) { profile = null; state.activeQuiz = null; state.answers = []; state.tab = 'lessons'; }
+  render();
+});
+</script>
+</body>
+</html>
