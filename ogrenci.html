@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e66">
+<meta name="robots" content="noindex, nofollow">
+<title>Öğrenci Paneli | Öğrenci Bahçesi</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌱%3C/text%3E%3C/svg%3E">
+<style>
+:root{--navy:#2c3e66;--navy-d:#1a2744;--text:#2d3748;--muted:#718096;--line:#e2e8f0;--soft:#f7fafc;--danger:#c53030;--grad:linear-gradient(135deg,var(--navy),var(--navy-d))}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#f5f7fa,#c3cfe2) fixed;min-height:100vh;min-height:100dvh;color:var(--text);overflow-wrap:anywhere;overflow-x:hidden;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.main{max-width:1280px;margin:0 auto;padding:32px 24px}
+.main.narrow{max-width:900px;padding-top:calc(24px + env(safe-area-inset-top))}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:2em;color:var(--navy);margin-bottom:8px}
+.header p{color:var(--muted)}
+.card{background:rgba(255,255,255,.98);border-radius:20px;padding:32px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin-bottom:32px}
+.card h2{margin-bottom:24px;font-size:1.5em;border-left:3px solid var(--navy);padding-left:16px}
+.form-card{max-width:480px;margin:0 auto 32px;text-align:center}
+.form-card h2{border:0;padding:0;color:var(--navy);margin-bottom:8px}
+.form-card .sub-t{color:var(--muted);font-size:14px;margin-bottom:24px}
+.fg{margin-bottom:20px;text-align:left}
+label{display:block;margin-bottom:8px;color:#4a5568;font-weight:500;font-size:14px}
+input,select{width:100%;padding:12px 16px;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;font:inherit;font-size:16px}
+input:focus,select:focus{outline:0;border-color:var(--navy);box-shadow:0 0 0 3px rgba(44,62,102,.1);background:#fff}
+button{width:100%;padding:12px 28px;background:var(--grad);color:#fff;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:500;cursor:pointer}
+button:hover{opacity:.95}
+button.gray{background:var(--line);color:#4a5568;margin-top:12px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.alert{padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:500;text-align:left}
+.er{background:#fff5f5;color:var(--danger);border:1px solid #feb2b2}
+.ok{background:#f0fff4;color:#276749;border:1px solid #9ae6b4}
+.empty{text-align:center;padding:48px 24px;color:#a0aec0;background:var(--soft);border-radius:16px}
+.wel{background:var(--grad);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.top-btns{display:flex;gap:8px;flex-wrap:wrap}
+.out{width:auto;padding:10px 20px;background:#edf2f7;color:#4a5568;border:1px solid var(--line);font-size:14px;font-weight:600}
+.navbar{background:#fff;border-radius:16px;margin-bottom:28px;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden}
+.nl{display:flex;list-style:none}
+.nl li{flex:1;text-align:center}
+.nl a{display:block;padding:16px 12px;color:#4a5568;font-weight:600;font-size:15px;text-decoration:none;border-bottom:3px solid transparent}
+.nl a:hover,.nl a.active{color:var(--navy);border-color:var(--navy);background:rgba(44,62,102,.05)}
+.class-card{background:var(--grad);color:#fff;padding:24px;border-radius:20px;margin-bottom:24px;text-align:center}
+.class-card h3{font-size:22px;margin-bottom:8px}
+.class-card p{opacity:.85;font-size:13px}
+.lbl{color:#4a5568;font-weight:600;margin:24px 0 16px}
+.slesson{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--soft);padding:16px 20px;margin:10px 0;border-radius:14px;border-left:4px solid var(--navy);font-weight:600}
+.slesson>span{min-width:0;flex:1;overflow-wrap:anywhere}
+.btn{display:inline-block;padding:8px 18px;color:var(--navy);background:#fff;border:1.5px solid var(--navy);border-radius:20px;text-decoration:none;font-size:13px;font-weight:600}
+.btn:hover{background:var(--navy);color:#fff}
+.warn{background:#fff5f5;color:var(--danger);padding:18px;border-radius:14px;text-align:center;border:1px solid #feb2b2}
+.modal{display:none;position:fixed;inset:0;z-index:1000;padding:16px;overflow-y:auto;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.modal.open{display:flex}
+.mc{width:100%;max-width:420px;margin:auto;padding:28px;background:#fff;border-radius:20px;box-shadow:0 25px 50px rgba(0,0,0,.2)}
+.mc h3{margin-bottom:16px;text-align:center}
+@media(hover:hover){.card:hover{box-shadow:0 20px 40px rgba(0,0,0,.12)}}
+@media(max-width:768px){
+.main{padding:24px 12px}
+.card{padding:20px}
+.header h1{font-size:1.6em}
+.top{flex-direction:column;align-items:stretch}
+.top-btns{width:100%}
+.out{flex:1;padding:12px}
+.nl{flex-direction:column}
+.nl a{text-align:left;border-bottom:1px solid #edf2f7;border-left:4px solid transparent}
+.nl a:hover,.nl a.active{border-left-color:var(--navy);border-bottom-color:#edf2f7}
+.slesson{flex-direction:column;align-items:flex-start}
+.btn{width:100%;text-align:center;padding:10px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.header h1{font-size:clamp(1.5rem,1.1rem + 1.8vw,2.2rem)}
+@media(min-width:1500px){.main{max-width:1440px}}
+@media(max-width:400px){.card{padding:16px;border-radius:16px}.main{padding:16px 10px}.mc{padding:22px 16px}}
+.install{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.dl{position:relative;overflow:hidden;min-height:48px;background:#fff;color:var(--navy);border:1.5px solid var(--navy);font-weight:600}
+.dl:hover{opacity:1}
+.dl:disabled{cursor:default}
+.dl-bar{position:absolute;inset:0 auto 0 0;width:0;background:rgba(44,62,102,.2);transition:width .15s linear}
+.dl-txt{position:relative}
+.dl.done{background:var(--grad);color:#fff}
+.dl.done .dl-bar{display:none}
+.install .hint{text-align:center;margin-top:10px;font-size:13px}
+</style>
+</head>
+<body>
+<main class="main narrow">
+  <div class="header">
+    <h1>Öğrenci Bahçesi</h1>
+    <p>Dersler, Defter ve Online Sınavlar</p>
+  </div>
+  <div id="app"></div>
+</main>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mc" id="mc"></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
+  EmailAuthProvider, reauthenticateWithCredential, updatePassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAtqtkB4mYY7t1HCM3umVLxRC2un30_-fQ",
+  authDomain: "ogrenciveyoyonetim.firebaseapp.com".replace('yoyo','yonet'),
+  databaseURL: "https://ogrenciveyonetim-default-rtdb.firebaseio.com",
+  projectId: "ogrenciveyonetim",
+  storageBucket: "ogrenciveyonetim.firebasestorage.app",
+  messagingSenderId: "660345359561",
+  appId: "1:660345359561:web:5c74d90d8624c8e4c75118"
+};
+firebaseConfig.authDomain = "ogrenciveyonetim.firebaseapp.com";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+/* Yardımcılar */
+const U = {
+  esc: s => String(s == null ? '' : s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';'),
+  now: () => Date.now(),
+  fd(ms, withTime = true) {
+    if (!ms) return '-';
+    const d = new Date(ms), p = n => String(n).padStart(2, '0');
+    const date = `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`;
+    return withTime ? `${date} ${p(d.getHours())}:${p(d.getMinutes())}` : date;
+  },
+  arr: o => Object.entries(o || {}).map(([id, v]) => ({ id, ...v })),
+  matchClass(classes, exam, edu) {
+    const norm = s => String(s || '').toLocaleLowerCase('tr').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ı/g, 'i').trim();
+    const has = (name, term) => !!term && new RegExp('(^|[^a-z0-9])' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-z0-9])').test(name);
+    const e = norm(exam), l = norm(edu);
+    let best, top = 0;
+    for (const c of [...classes].sort((x, y) => (x.created_at || 0) - (y.created_at || 0))) {
+      const n = norm(c.class_name), score = (has(n, e) ? 2 : 0) + (has(n, l) ? 1 : 0);
+      if (score > top) { best = c; top = score; }
+    }
+    return best;
+  }
+};
+const { esc, fd, matchClass } = U;
+const objArr = U.arr;
+
+const STUDENT_EMAIL_DOMAIN = 'ogrenci-bahcesi.app';
+const appEl = document.getElementById('app');
+const modalEl = document.getElementById('modal');
+const modalBox = document.getElementById('mc');
+
+const LINKS = [
+  ['Ders Programım', 'https://mektepiq1.github.io/cay/dersprogram.html'],
+  ['Defter', 'https://mektepiq1.github.io/cay/cizgilideff.html'],
+  ['Deneme', 'https://denemelerburda.infinityfreeapp.com/soru.php']
+];
+
+let currentStudent = null;
+let error = '', lastUser = '', success = '';
+
+const alertHtml = () => {
+  let out = '';
+  if (error) { out += `<div class="alert er">${esc(error)}</div>`; error = ''; }
+  if (success) { out += `<div class="alert ok">${esc(success)}</div>`; success = ''; }
+  return out;
+};
+
+/* ---------- Görünümler ---------- */
+const loginView = () => `
+  <div class="card form-card">
+    <h2>Hoş Geldiniz</h2>
+    <p class="sub-t">Sisteme erişmek için kullanıcı adı ve şifrenizle giriş yapın</p>
+    ${alertHtml()}
+    <form data-f="login">
+      <div class="fg"><label>Kullanıcı Adı</label>
+        <input name="un" required autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(lastUser)}"></div>
+      <div class="fg"><label>Şifre</label>
+        <input name="pw" type="password" required autocomplete="current-password"></div>
+      <button>Giriş Yap</button>
+    </form>
+    ${installHtml()}
+  </div>`;
+
+const welcome = user => `
+  <div class="top">
+    <div class="wel">Hoş Geldin, ${esc(user.username)}!</div>
+    <div class="top-btns">
+      <button class="out" data-a="passwd" type="button">Şifremi Değiştir</button>
+      <button class="out" data-a="logout" type="button">Çıkış Yap</button>
+    </div>
+  </div>`;
+
+const optionTags = list => list.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+
+const profileView = (user, opts) => `
+  <div class="card">${welcome(user)}
+    <div class="card form-card" style="box-shadow:none;border:1px solid var(--line)">
+      <h2>Profilinizi Tamamlayın</h2>
+      <p class="sub-t">Sistemi kullanabilmeniz için lütfen bilgilerinizi güncelleyin.</p>
+      ${alertHtml()}` +
+      (opts.exam.length && opts.edu.length ? `
+      <form data-f="profile">
+        <div class="fg"><label>1. Soru: Girmek istediğiniz sınavı seçiniz:</label>
+          <select name="exam" required><option value="">-- Seçiniz --</option>${optionTags(opts.exam)}</select></div>
+        <div class="fg"><label>2. Soru: Öğrenim durumunuz nedir?</label>
+          <select name="education_status" required><option value="">-- Seçiniz --</option>${optionTags(opts.edu)}</select></div>
+        <button>Kaydet ve Devam Et</button>
+      </form>` : `
+      <div class="warn"><p>Seçenek listeleri henüz hazırlanmamış.</p><p>Lütfen yöneticinizle iletişime geçin.</p></div>`) + `
+    </div>
+  </div>`;
+
+const panelView = (user, cls, lessons) => `
+  <div class="card">${welcome(user)}
+    <nav class="navbar" aria-label="Öğrenci menüsü"><ul class="nl">
+      <li><a class="active" href="ogrenci.html">Sınıfım ve Derslerim</a></li>
+      ${LINKS.map(([t, u]) => `<li><a href="${u}">${t}</a></li>`).join('')}
+    </ul></nav>
+    ${alertHtml()}
+    <h2 style="margin-bottom:20px">Sınıfım ve Derslerim</h2>` +
+  (cls ? `
+    <div class="class-card"><h3>${esc(cls.class_name)}</h3><p>Kayıt Tarihi: ${fd(cls.created_at, false)}</p></div>
+    <div class="lbl">Derslerim:</div>` +
+    (lessons.length ? lessons.map(l => `
+      <div class="slesson"><span>${esc(l.lesson_name)}</span>
+        ${l.link_url ? `<a class="btn" href="${esc(l.link_url)}" target="_blank" rel="noopener noreferrer">İncele</a>` : ''}</div>`).join('')
+      : '<div class="empty"><p>Bu sınıfa henüz ders eklenmemiş.</p></div>')
+    : `<div class="warn"><p>Henüz size bir sınıf atanmamış veya otomatik eşleşme sağlanamamış.</p>
+       <p>Lütfen yöneticinizle iletişime geçin.</p></div>`) + '</div>';
+
+/* ---------- Render ---------- */
+async function render() {
+  if (!currentStudent) {
+    appEl.innerHTML = loginView();
+    return;
+  }
+  const [optSnap, clsSnap, lesSnap] = await Promise.all([
+    get(ref(db, 'options')), get(ref(db, 'classes')), get(ref(db, 'lessons'))
+  ]);
+  const opts = objArr(optSnap.val()).sort((a, b) => (a.created_at || 0) - (b.created_at || 0));
+  const classes = objArr(clsSnap.val());
+  const lessons = objArr(lesSnap.val());
+
+  const user = currentStudent;
+  if (!user.exam || !user.education_status) {
+    const by = t => opts.filter(o => o.type === t).map(o => o.label);
+    appEl.innerHTML = profileView(user, { exam: by('exam'), edu: by('edu') });
+    return;
+  }
+  const cls = classes.find(c => c.id === user.class_id);
+  const clsLessons = cls ? lessons.filter(l => l.class_id === cls.id).sort((a, b) => (b.created_at || 0) - (a.created_at || 0)) : [];
+  appEl.innerHTML = panelView(user, cls, clsLessons);
+}
+
+/* ---------- Modal ---------- */
+const closeModal = () => modalEl.classList.remove('open');
+function passwordModal() {
+  modalBox.innerHTML = `
+    <h3>Şifre Değiştir</h3>
+    ${alertHtml()}
+    <form data-f="chpw">
+      <div class="fg"><label>Mevcut Şifre</label>
+        <input name="cur" type="password" required autocomplete="current-password"></div>
+      <div class="fg"><label>Yeni Şifre</label>
+        <input name="new" type="password" required minlength="6" autocomplete="new-password">
+        <div class="hint">En az 6 karakter.</div></div>
+      <button>Şifremi Değiştir</button>
+      <button type="button" class="gray" data-a="close">İptal</button>
+    </form>`;
+  modalEl.classList.add('open');
+  modalBox.querySelector('form').onsubmit = async e => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('Oturum bulunamadı.');
+      const cred = EmailAuthProvider.credential(user.email, f.get('cur'));
+      await reauthenticateWithCredential(user, cred);
+      await updatePassword(user, f.get('new'));
+      closeModal();
+      success = 'Şifreniz başarıyla değiştirildi.';
+    } catch (err) {
+      closeModal();
+      const m = err.code === 'auth/wrong-password' ? 'Mevcut şifre hatalı.' : (err.message || 'Şifre değiştirilemedi.');
+      error = m;
+    }
+    render();
+  };
+}
+
+/* ---------- İşlemler ---------- */
+const forms = {
+  async login(d) {
+    const username = d.get('un').trim().toLowerCase();
+    const pw = d.get('pw');
+    if (!username || !pw) return;
+    try {
+      const snap = await get(ref(db, `usernames/${username}`));
+      if (!snap.exists()) throw new Error('nouser');
+      const { email } = snap.val();
+      await signInWithEmailAndPassword(auth, email, pw);
+      // onAuthStateChanged devreye girer
+    } catch (e) {
+      error = e.message === 'nouser' ? 'Kullanıcı adı veya şifre hatalı.' : 'Kullanıcı adı veya şifre hatalı.';
+      lastUser = d.get('un').trim();
+      render();
+    }
+  },
+
+  async profile(d) {
+    const exam = d.get('exam'), edu = d.get('education_status');
+    if (!currentStudent || !exam || !edu) { error = 'Lütfen tüm alanları eksiksiz doldurunuz.'; return; }
+    const clsSnap = await get(ref(db, 'classes'));
+    const classes = objArr(clsSnap.val());
+    const match = matchClass(classes, exam, edu);
+    await update(ref(db, `students/${currentStudent.id}`), {
+      exam, education_status: edu,
+      class_id: match ? match.id : (currentStudent.class_id || null)
+    });
+    currentStudent = { ...currentStudent, exam, education_status: edu, class_id: match ? match.id : currentStudent.class_id };
+    success = 'Profiliniz kaydedildi.';
+  }
+};
+
+/* ---------- Olaylar ---------- */
+appEl.addEventListener('submit', async e => {
+  e.preventDefault();
+  try { await forms[e.target.dataset.f]?.(new FormData(e.target)); }
+  catch (err) { error = err.message || 'İşlem sırasında bir hata oluştu.'; }
+  render();
+});
+
+document.addEventListener('click', async e => {
+  if (e.target === modalEl) return closeModal();
+  const b = e.target.closest('[data-a]');
+  if (!b) return;
+  const a = b.dataset.a;
+  if (a === 'close') return closeModal();
+  if (a === 'install') return downloadApp();
+  if (a === 'passwd') return passwordModal();
+  if (a === 'logout') { await signOut(auth); }
+});
+
+/* ---------- Auth akışı ---------- */
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    currentStudent = null;
+    render();
+    return;
+  }
+  try {
+    const snap = await get(ref(db, `students/${user.uid}`));
+    if (!snap.exists()) {
+      await signOut(auth);
+      error = 'Hesabınız sistemde kayıtlı değil. Yöneticinizle iletişime geçin.';
+      render();
+      return;
+    }
+    currentStudent = { id: user.uid, ...snap.val() };
+    render();
+  } catch (e) {
+    error = 'Veriler yüklenemedi: ' + e.message;
+    render();
+  }
+});
+
+/* ---------- PWA / Uygulama indirme ---------- */
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let deferredPrompt = null;
+let inst = { state: 'idle', pct: 0, hint: '' };
+
+const installInner = () => {
+  const { state, pct, hint } = inst;
+  const label = state === 'busy' ? `İndiriliyor %${pct}` : state === 'done' ? 'Uygulama Eklendi ✓' : 'Uygulamayı İndir';
+  return `<button type="button" class="dl${state === 'done' ? ' done' : ''}" data-a="install"${state === 'idle' ? '' : ' disabled'}>
+    <span class="dl-bar" style="width:${pct}%"></span><span class="dl-txt">${label}</span></button>
+    ${hint ? `<p class="hint" role="status">${esc(hint)}</p>` : ''}`;
+};
+const installHtml = () => isStandalone() ? '' : `<div class="install" id="install">${installInner()}</div>`;
+const paintInstall = () => { const el = document.getElementById('install'); if (el) el.innerHTML = installInner(); };
+
+function setupManifest() {
+  const icon = size => {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const x = c.getContext('2d');
+    x.fillStyle = '#2c3e66';
+    x.fillRect(0, 0, size, size);
+    x.font = `${size * 0.55}px sans-serif`;
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.fillText('🌱', size / 2, size * 0.54);
+    return c.toDataURL('image/png');
+  };
+  const base = location.href.split('#')[0].split('?')[0];
+  const manifest = {
+    id: base, name: 'Öğrenci Bahçesi', short_name: 'Öğrenci Bahçesi', lang: 'tr',
+    start_url: base, scope: base.slice(0, base.lastIndexOf('/') + 1), display: 'standalone',
+    background_color: '#f5f7fa', theme_color: '#2c3e66',
+    icons: [192, 512].map(s => ({ src: icon(s), sizes: `${s}x${s}`, type: 'image/png', purpose: 'any' }))
+  };
+  const add = (rel, href) => { const l = document.createElement('link'); l.rel = rel; l.href = href; document.head.appendChild(l); };
+  add('manifest', URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' })));
+  add('apple-touch-icon', icon(180));
+}
+
+async function downloadApp() {
+  if (inst.state !== 'idle') return;
+  inst = { state: 'busy', pct: 0, hint: '' };
+  paintInstall();
+
+  const MIN_MS = 1800, t0 = performance.now();
+  let got = 0, total = 0, finished = false;
+  fetch(location.href.split('#')[0], { cache: 'reload' })
+    .then(async r => {
+      total = +r.headers.get('content-length') || 0;
+      const reader = r.body.getReader();
+      for (;;) { const { done, value } = await reader.read(); if (done) break; got += value.length; }
+    })
+    .catch(() => {})
+    .finally(() => { finished = true; });
+
+  await new Promise(resolve => {
+    const tick = () => {
+      const time = Math.min((performance.now() - t0) / MIN_MS, 1);
+      const real = finished ? 1 : total ? Math.min(got / total, 0.95) : 0.95;
+      inst.pct = Math.floor(Math.min(time, real) * 100);
+      if (finished && time >= 1) inst.pct = 100;
+      paintInstall();
+      inst.pct === 100 ? resolve() : requestAnimationFrame(tick);
+    };
+    tick();
+  });
+
+  try {
+    if (!deferredPrompt) throw new Error('no-prompt');
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    inst = outcome === 'accepted'
+      ? { state: 'done', pct: 100, hint: '' }
+      : { state: 'idle', pct: 0, hint: 'Ekleme iptal edildi. Tekrar deneyebilirsiniz.' };
+  } catch {
+    inst = { state: 'idle', pct: 0, hint: isIOS
+      ? 'Safari\u2019de Paylaş simgesine dokunup \u201cAna Ekrana Ekle\u201d seçeneğini seçin.'
+      : 'Tarayıcı menüsünden \u201cUygulamayı yükle\u201d veya \u201cAna ekrana ekle\u201d seçeneğini kullanın.' };
+  }
+  paintInstall();
+}
+
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+addEventListener('appinstalled', () => { deferredPrompt = null; inst = { state: 'done', pct: 100, hint: '' }; paintInstall(); });
+setupManifest();
+</script>
+</body>
+</html>
