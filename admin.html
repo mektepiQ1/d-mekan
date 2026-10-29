@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e66">
+<meta name="robots" content="noindex, nofollow">
+<title>Yönetici Paneli | Öğrenci Bahçesi</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌱%3C/text%3E%3C/svg%3E">
+<style>
+:root{--navy:#2c3e66;--navy-d:#1a2744;--text:#2d3748;--muted:#718096;--line:#e2e8f0;--soft:#f7fafc;--danger:#c53030;--grad:linear-gradient(135deg,var(--navy),var(--navy-d))}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#f5f7fa,#c3cfe2) fixed;min-height:100vh;min-height:100dvh;color:var(--text);overflow-wrap:anywhere;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:100;padding-top:env(safe-area-inset-top);background:rgba(255,255,255,.95);box-shadow:0 2px 20px rgba(0,0,0,.08);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.topbar-in{max-width:1280px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.logo{padding:16px 0;font-size:1.4em;color:var(--navy)}
+.tabs{display:flex;list-style:none;gap:32px}
+.tabs a{display:block;padding:20px 0;color:#4a5568;font-weight:500;font-size:15px;text-decoration:none;border-bottom:2px solid transparent}
+.tabs a:hover,.tabs a.active{color:var(--navy);border-color:var(--navy)}
+.main{max-width:1280px;margin:0 auto;padding:32px 24px}
+.main.narrow{max-width:900px;padding-top:calc(24px + env(safe-area-inset-top))}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:2em;color:var(--navy);margin-bottom:8px}
+.header p{color:var(--muted)}
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.card{background:rgba(255,255,255,.98);border-radius:20px;padding:32px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin-bottom:32px}
+.card h2{margin-bottom:24px;font-size:1.5em;border-left:3px solid var(--navy);padding-left:16px}
+.card>p{color:#4a5568;margin-bottom:12px}
+.form-card{max-width:480px;margin:0 auto 32px;text-align:center}
+.form-card h2{border:0;padding:0;color:var(--navy);margin-bottom:8px}
+.form-card .sub-t{color:var(--muted);font-size:14px;margin-bottom:24px}
+.fg{margin-bottom:20px;text-align:left}
+label{display:block;margin-bottom:8px;color:#4a5568;font-weight:500;font-size:14px}
+input,select{width:100%;padding:12px 16px;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;font:inherit;font-size:16px}
+input:focus,select:focus{outline:0;border-color:var(--navy);box-shadow:0 0 0 3px rgba(44,62,102,.1);background:#fff}
+button{width:100%;padding:12px 28px;background:var(--grad);color:#fff;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:500;cursor:pointer}
+button:hover{opacity:.95}
+button.gray{background:var(--line);color:#4a5568;margin-top:12px}
+.sm{display:inline-block;width:auto;min-height:36px;padding:8px 16px;font-size:13px;font-weight:500;text-decoration:none;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:20px;cursor:pointer}
+.sm:hover{background:var(--navy);color:#fff;opacity:1}
+.sm.del{color:var(--danger);border-color:#feb2b2}
+.sm.del:hover{background:var(--danger);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.alert{padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:500;text-align:left}
+.ok{background:#f0fff4;color:#276749;border:1px solid #9ae6b4}
+.er{background:#fff5f5;color:var(--danger);border:1px solid #feb2b2}
+.item{background:var(--soft);padding:18px;margin-bottom:12px;border-radius:14px;border-left:3px solid var(--navy)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.nm{font-size:17px}
+small,.mut{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+.mut{font-size:13px;color:#a0aec0;margin:12px 0}
+.sub{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.t{font-size:13px;font-weight:600;color:#4a5568;margin-bottom:8px}
+.les{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;padding:10px 14px;margin:8px 0;border-radius:10px;border-left:2px solid var(--navy)}
+.inl{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.inl input{flex:1;min-width:160px}
+.inl button{width:auto}
+.tag{display:inline-block;margin-top:4px;padding:4px 8px;background:#edf2f7;border-radius:6px;font-size:13px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.empty{text-align:center;padding:48px 24px;color:#a0aec0;background:var(--soft);border-radius:16px}
+.acc{margin-bottom:16px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.ah{display:flex;justify-content:space-between;gap:12px;width:100%;padding:16px 20px;background:var(--grad);color:#fff;border-radius:0;text-align:left;font-size:16px}
+.ac{display:none;max-height:500px;overflow-y:auto}
+.acc.open .ac{display:block}
+.acc.stu .ac{max-height:none}
+.ac>.item{margin:12px}
+.li{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--soft);padding:16px;margin:12px;border-radius:12px;border-left:3px solid var(--navy)}
+.modal{display:none;position:fixed;inset:0;z-index:1000;padding:16px;overflow-y:auto;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.modal.open{display:flex}
+.mc{width:100%;max-width:450px;margin:auto;padding:32px;background:#fff;border-radius:24px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,.2)}
+.mc h3{margin-bottom:16px}
+.mc p{margin-bottom:16px}
+.wel{background:var(--grad);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.out{width:auto;padding:10px 20px;background:#edf2f7;color:#4a5568;border:1px solid var(--line);font-size:14px;font-weight:600}
+.navbar{background:#fff;border-radius:16px;margin-bottom:28px;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden}
+.nl{display:flex;list-style:none}
+.nl li{flex:1;text-align:center}
+.nl a{display:block;padding:16px 12px;color:#4a5568;font-weight:600;font-size:15px;text-decoration:none;border-bottom:3px solid transparent}
+.nl a:hover,.nl a.active{color:var(--navy);border-color:var(--navy);background:rgba(44,62,102,.05)}
+.class-card{background:var(--grad);color:#fff;padding:24px;border-radius:20px;margin-bottom:24px;text-align:center}
+.class-card h3{font-size:22px;margin-bottom:8px}
+.class-card p{opacity:.85;font-size:13px}
+.lbl{color:#4a5568;font-weight:600;margin:24px 0 16px}
+.slesson{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--soft);padding:16px 20px;margin:10px 0;border-radius:14px;border-left:4px solid var(--navy);font-weight:600}
+.btn{display:inline-block;padding:8px 18px;color:var(--navy);background:#fff;border:1.5px solid var(--navy);border-radius:20px;text-decoration:none;font-size:13px;font-weight:600}
+.btn:hover{background:var(--navy);color:#fff}
+.warn{background:#fff5f5;color:var(--danger);padding:18px;border-radius:14px;text-align:center;border:1px solid #feb2b2}
+@media(hover:hover){.card:hover{box-shadow:0 20px 40px rgba(0,0,0,.12)}}
+@media(max-width:768px){
+.dash{grid-template-columns:1fr;gap:24px}
+.topbar-in{flex-direction:column;padding:4px 16px}
+.logo{padding:12px 0 4px;font-size:1.2em}
+.tabs{width:100%;justify-content:space-around;gap:8px;overflow-x:auto}
+.tabs a{padding:12px 6px;font-size:14px;white-space:nowrap}
+.main{padding:24px 12px}
+.card{padding:20px}
+.header h1{font-size:1.6em}
+.btns,.btns .sm,.row>.sm{width:100%;text-align:center}
+.inl button{width:100%}
+.top{flex-direction:column;align-items:stretch}
+.out{width:100%;padding:12px}
+.nl{flex-direction:column}
+.nl a{text-align:left;border-bottom:1px solid #edf2f7;border-left:4px solid transparent}
+.nl a:hover,.nl a.active{border-left-color:var(--navy);border-bottom-color:#edf2f7}
+.slesson{flex-direction:column;align-items:flex-start}
+.btn{width:100%;text-align:center;padding:10px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.header h1{font-size:clamp(1.5rem,1.1rem + 1.8vw,2.2rem)}
+.tabs{scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.row>*,.li>div,.les>span,.slesson>span{min-width:0}
+@media(min-width:1500px){.main{max-width:1440px}.main.narrow{max-width:1000px}}
+@media(max-width:400px){.card{padding:16px;border-radius:16px}.main{padding:16px 10px}.tabs a{font-size:13px}.mc{padding:24px 18px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <h2 class="logo">Öğrenci Bahçesi</h2>
+    <nav aria-label="Ana menü">
+      <ul class="tabs">
+        <li><a href="#dashboard">Ana Sayfa</a></li>
+        <li><a href="#classes">Sınıflar</a></li>
+        <li><a href="#students">Öğrenciler</a></li>
+        <li><a href="#links">Bağlantılar</a></li>
+        <li><a href="#options">Seçenekler</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="main" id="app"></main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mc" id="mc"></div></div>
+
+<script type="module">
+'use strict';
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAtqtkB4mYY7t1HCM3umVLxRC2un30_-fQ",
+  authDomain: "ogrenciveyonetim.firebaseapp.com",
+  databaseURL: "https://ogrenciveyonetim-default-rtdb.firebaseio.com",
+  projectId: "ogrenciveyonetim",
+  storageBucket: "ogrenciveyonetim.firebasestorage.app",
+  messagingSenderId: "660345359561",
+  appId: "1:660345359561:web:5c74d90d8624c8e4c75118",
+  measurementId: "G-C7TN0GBJL3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const sha = async text => {
+  if (!crypto.subtle) return text;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+/* Firebase Realtime Database katmanı */
+const DB = (() => {
+  return {
+    async all(store) {
+      const snap = await get(ref(db, store));
+      if (!snap.exists()) return [];
+      const val = snap.val();
+      if (Array.isArray(val)) return val.filter(Boolean);
+      return Object.entries(val).map(([k, v]) => ({ ...v, _fbKey: k }));
+    },
+    async get(store, id) {
+      const snap = await get(ref(db, `${store}/${id}`));
+      return snap.exists() ? snap.val() : null;
+    },
+    async put(store, item) {
+      if (store === 'session') {
+        await set(ref(db, `${store}/${item.key}`), item);
+        return item;
+      }
+      let key = item._fbKey;
+      if (!key) {
+        const items = await this.all(store);
+        const maxId = items.reduce((m, x) => Math.max(m, x.id || 0), 0);
+        item.id = item.id || (maxId + 1);
+        key = `item_${item.id}`;
+      }
+      await set(ref(db, `${store}/${key}`), { ...item, _fbKey: key });
+      return item;
+    },
+    async del(store, idOrKey) {
+      const items = await this.all(store);
+      const found = items.find(x => x.id === idOrKey || x._fbKey === idOrKey);
+      if (found && found._fbKey) {
+        await remove(ref(db, `${store}/${found._fbKey}`));
+      } else {
+        await remove(ref(db, `${store}/${idOrKey}`));
+      }
+    },
+    async load() {
+      const [classes, lessons, users, links, options] = await Promise.all(
+        ['classes', 'lessons', 'users', 'links', 'options'].map(s => this.all(s)));
+      return { classes, lessons, users, links, options };
+    },
+    async cred(password) {
+      const salt = [...crypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
+      return { salt, hash: await sha(salt + password) };
+    },
+    async verify(user, password) {
+      return (await sha(user.salt + password)) === user.hash;
+    }
+  };
+})();
+
+/* Yardımcılar */
+const U = {
+  esc: s => String(s == null ? '' : s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';'),
+  now: () => new Date().toISOString(),
+  fd(iso, withTime = true) {
+    const d = new Date(iso), p = n => String(n).padStart(2, '0');
+    const date = `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`;
+    return withTime ? `${date} ${p(d.getHours())}:${p(d.getMinutes())}` : date;
+  },
+  okUrl(u) {
+    try { return /^https?:$/.test(new URL(u).protocol); } catch { return false; }
+  }
+};
+
+(() => {
+  const { esc, now, fd, okUrl } = U;
+  const ADMIN_PASSWORD = '1234';
+  const WRONG = 'Parola hatalı. Silme işlemi gerçekleştirilemedi.';
+  const app = document.getElementById('app');
+  const modalEl = document.getElementById('modal');
+  const modalBox = document.getElementById('mc');
+  let D, flash = null;
+  const collapsed = new Set();
+
+  const msg = (type, text) => { flash = { type, text }; return render(); };
+  const alertHtml = () => {
+    const f = flash; flash = null;
+    return f ? `<div class="alert ${f.type}">${esc(f.text)}</div>` : '';
+  };
+  const head = (h, s) => `<div class="header"><h1>${h}</h1><p>${s}</p></div>`;
+  const PW_FIELD = '<div class="fg"><label>Yetki Parolası:</label><input type="password" name="pw" required placeholder="Parolayı giriniz"></div>';
+  const empty = (a, b) => `<div class="empty"><p>${a}</p><p>${b}</p></div>`;
+
+  const views = {
+    dashboard: () => head('Yönetici Paneli', 'Öğrenci Bahçesi - Ana Panel') + `
+      <div class="dash">
+        <div class="card"><h2>Sınıf Oluştur</h2>${alertHtml()}
+          <form data-f="class"><div class="fg"><label>Sınıf Adı</label>
+            <input name="n" required maxlength="100" placeholder="Örn: TYT Lise, KPSS Lisans, 10-A">
+            <div class="hint">Öğrenci profilini doldurunca otomatik atanır.</div></div>
+            <button>Sınıf Ekle</button></form></div>
+        <div class="card"><h2>Bilgi</h2>
+          <p>Öğrenciler ogrenci.html üzerinden giriş yapar. Sınıf, ders, öğrenci ve bağlantıları bu panelden yönetebilirsiniz.</p>
+          <p><strong>Yetki Parolası:</strong> ${ADMIN_PASSWORD}</p></div>
+      </div>`,
+
+    classes() {
+      const list = [...D.classes].sort((a, b) => b.id - a.id);
+      return head('Sınıf Yönetimi', 'Tüm sınıflar ve dersler') + `<div class="card"><h2>Tüm Sınıflar</h2>${alertHtml()}` +
+        (list.length ? list.map(c => {
+          const lessons = D.lessons.filter(l => l.class_id === c.id).sort((a, b) => b.id - a.id);
+          return `<div class="item">
+            <div class="row"><strong class="nm">${esc(c.class_name)}</strong><button class="sm del" data-a="delClass" data-id="${c.id}">Sil</button></div>
+            <small>Eklenme: ${fd(c.created_at)}</small>
+            <div class="sub"><div class="t">Bu Sınıfa Ait Dersler:</div>
+              ${lessons.length ? lessons.map(l => `<div class="les"><span>${esc(l.lesson_name)}</span>
+                <button class="sm" data-a="lessonLink" data-id="${l.id}">Link Ekle</button></div>`).join('') : '<div class="mut">Henüz ders eklenmemiş.</div>'}
+              <form class="inl" data-f="lesson" data-id="${c.id}">
+                <input name="n" required maxlength="100" placeholder="Ders adı"><button>Ders Ekle</button></form>
+            </div></div>`;
+        }).join('') : empty('Henüz hiç sınıf eklenmemiş.', 'Ana sayfadaki formdan ekleyebilirsiniz.')) + '</div>';
+    },
+
+    students() {
+      const list = [...D.users].sort((a, b) => b.id - a.id);
+      const order = type => D.options.filter(o => o.type === type).sort((a, b) => a.id - b.id).map(o => o.label);
+      const exams = order('exam'), edus = order('edu');
+      const rank = (arr, v) => { const i = arr.indexOf(v); return i < 0 ? arr.length : i; };
+      const byKey = new Map();
+      list.forEach(u => {
+        const done = !!(u.exam && u.education_status);
+        const key = done ? JSON.stringify([u.exam, u.education_status]) : 'new';
+        if (!byKey.has(key)) byKey.set(key, { key, done, exam: u.exam, edu: u.education_status, users: [] });
+        byKey.get(key).users.push(u);
+      });
+      const groups = [...byKey.values()].sort((a, b) =>
+        a.done - b.done ||
+        rank(exams, a.exam) - rank(exams, b.exam) || String(a.exam).localeCompare(String(b.exam), 'tr') ||
+        rank(edus, a.edu) - rank(edus, b.edu) || String(a.edu).localeCompare(String(b.edu), 'tr'));
+      return head('Öğrenci Yönetimi', 'Öğrenci hesapları ve giriş bilgileri') + `
+        <div class="card"><h2>Yeni Öğrenci Ekle</h2>${alertHtml()}
+          <form data-f="student">
+            <div class="fg"><label>Kullanıcı Adı</label><input name="un" required maxlength="30" autocomplete="off" autocapitalize="none"></div>
+            <div class="fg"><label>Şifre</label><input name="pw" required minlength="4" maxlength="60" autocomplete="off"></div>
+            <button>Öğrenci Ekle</button></form></div>
+        <div class="card"><h2>Kayıtlı Öğrenciler</h2>` +
+        (groups.length ? groups.map(g => `<div class="acc stu${collapsed.has(g.key) ? '' : ' open'}">
+          <button class="ah" data-a="toggleGroup" data-k="${esc(g.key)}"><span>${g.done ? `${esc(g.exam)} · ${esc(g.edu)}` : 'Yeni Kayıt'} (${g.users.length} öğrenci)</span><span>▼</span></button>
+          <div class="ac">${g.users.map(u => {
+            const c = D.classes.find(x => x.id === u.class_id);
+            const noClass = g.done ? 'Sınıf atanmamış' : 'Profil bekleniyor';
+            return `<div class="item"><div class="row"><div>
+              <strong class="nm">${esc(u.username)}</strong>
+              <small>Kayıt Tarihi: ${fd(u.created_at)}</small>
+              <small>${c ? `Atanan Sınıf: <b>${esc(c.class_name)}</b>` : noClass}</small></div>
+              <div class="btns"><button class="sm" data-a="creds" data-id="${u.id}">Giriş Bilgileri</button>
+                <button class="sm" data-a="assign" data-id="${u.id}">Sınıf Seç</button>
+                <button class="sm del" data-a="delUser" data-id="${u.id}">Sil</button></div></div></div>`;
+          }).join('')}</div></div>`).join('')
+          : empty('Henüz hiç öğrenci eklenmemiş.', 'Yukarıdaki formdan ekleyebilirsiniz.')) + '</div>';
+    },
+
+    links() {
+      const groups = {};
+      D.links.forEach(l => (groups[l.category] = groups[l.category] || []).push(l));
+      const cats = Object.keys(groups).sort((a, b) => a.localeCompare(b, 'tr'));
+      return head('Bağlantı Yönetimi', 'Kategorilere göre bağlantılar') + `
+        <div class="card"><h2>Yeni Bağlantı Ekle</h2>${alertHtml()}
+          <form data-f="link">
+            <div class="fg"><label>Kategori Seç</label>
+              <select name="c" id="cat" required><option value="">-- Kategori Seçiniz --</option>
+                ${cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}
+                <option value="__new">+ Yeni kategori ekle...</option></select>
+              <input name="nc" id="nc" maxlength="100" placeholder="Yeni kategori adı" hidden style="margin-top:10px"></div>
+            <div class="fg"><label>Buton Metni</label><input name="b" required maxlength="100" placeholder="Buton adı"></div>
+            <div class="fg"><label>Bağlantı URL</label><input name="u" type="url" required placeholder="https://..."></div>
+            <button>Bağlantı Ekle</button></form></div>` +
+        (cats.length ? cats.map(c => `<div class="acc"><button class="ah" data-a="toggle"><span>${esc(c)} (${groups[c].length} bağlantı)</span><span>▼</span></button>
+          <div class="ac">${[...groups[c]].sort((a, b) => b.id - a.id).map(l => `<div class="li"><div>
+            <strong>${esc(l.button_text)}</strong><small>${esc(l.link_url)}</small></div>
+            <div class="btns"><a class="sm" href="${esc(l.link_url)}" target="_blank" rel="noopener noreferrer">Git</a>
+              <button class="sm del" data-a="delLink" data-id="${l.id}">Sil</button></div></div>`).join('')}</div></div>`).join('')
+          : empty('Henüz bağlantı eklenmemiş.', ''));
+    },
+
+    options() {
+      const section = (type, title, placeholder) => {
+        const list = D.options.filter(o => o.type === type).sort((a, b) => a.id - b.id);
+        return `<div class="card"><h2>${title}</h2>
+          <form class="inl" data-f="option" data-type="${type}" style="margin:0 0 20px">
+            <input name="n" required maxlength="60" autocomplete="off" placeholder="${placeholder}"><button>Ekle</button></form>` +
+          (list.length ? list.map(o => `<div class="item"><div class="row"><strong class="nm">${esc(o.label)}</strong>
+            <button class="sm del" data-a="delOption" data-id="${o.id}">Sil</button></div></div>`).join('')
+            : empty('Seçenek yok.', '')) + '</div>';
+      };
+      return head('Seçenekler', 'Sınav ve öğrenim düzeyi listeleri') + alertHtml() +
+        section('exam', 'Sınav Türleri', 'Örn: TYT, AYT...') +
+        section('edu', 'Öğrenim Düzeyleri', 'Örn: Lise, Lisans...');
+    }
+  };
+
+  async function render() {
+    D = await DB.load();
+    let page = location.hash.slice(1);
+    if (!views[page]) page = 'dashboard';
+    app.innerHTML = views[page]();
+    document.querySelectorAll('.tabs a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + page));
+  }
+
+  const closeModal = () => modalEl.classList.remove('open');
+  function modal(title, text, fields, button, onSubmit) {
+    modalBox.innerHTML = `<h3>${title}</h3><p>${text}</p><form>${fields}<button>${button}</button><button type="button" class="gray" data-a="close">İptal</button></form>`;
+    modalEl.classList.add('open');
+    modalBox.querySelector('form').onsubmit = async e => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      closeModal();
+      await onSubmit(data);
+    };
+  }
+  function confirmDelete(title, name, text, button, run, note = '') {
+    modal(title, `<strong>${esc(name)}</strong> ${text}${note}`, PW_FIELD, button, async f => {
+      if (f.get('pw') !== ADMIN_PASSWORD) return msg('er', WRONG);
+      msg('ok', await run());
+    });
+  }
+
+  const forms = {
+    async class(d) {
+      const n = d.get('n').trim();
+      if (!n) return msg('er', 'Geçerli bir sınıf adı giriniz.');
+      await DB.put('classes', { class_name: n, created_at: now() });
+      msg('ok', 'Sınıf başarıyla eklendi.');
+    },
+    async lesson(d, f) {
+      const n = d.get('n').trim();
+      if (!n) return;
+      await DB.put('lessons', { class_id: +f.dataset.id, lesson_name: n, link_url: '', created_at: now() });
+      msg('ok', 'Ders başarıyla eklendi.');
+    },
+    async student(d) {
+      const username = d.get('un').trim(), pw = d.get('pw');
+      if (!/^[\w.-]{3,30}$/.test(username) || pw.length < 4)
+        return msg('er', 'Kullanıcı adı ve şifre kurallara uymalı.');
+      if (D.users.some(u => u.username.toLowerCase() === username.toLowerCase()))
+        return msg('er', 'Bu kullanıcı adı zaten kullanılıyor.');
+      await DB.put('users', { username, ...await DB.cred(pw), exam: null, education_status: null, class_id: null, created_at: now() });
+      msg('ok', 'Öğrenci başarıyla eklendi.');
+    },
+    async option(d, f) {
+      const type = f.dataset.type, label = d.get('n').trim();
+      if (!label) return;
+      await DB.put('options', { type, label, created_at: now() });
+      msg('ok', 'Seçenek eklendi.');
+    },
+    async link(d) {
+      const c = d.get('c') === '__new' ? (d.get('nc') || '').trim() : d.get('c');
+      const b = d.get('b').trim(), u = d.get('u').trim();
+      if (!c || !b || !okUrl(u)) return msg('er', 'Eksik veya hatalı bilgi.');
+      await DB.put('links', { category: c, button_text: b, link_url: u, created_at: now() });
+      msg('ok', 'Bağlantı eklendi.');
+    }
+  };
+
+  const actions = {
+    close: closeModal,
+    toggle: b => b.parentElement.classList.toggle('open'),
+    toggleGroup(b) {
+      const k = b.dataset.k;
+      collapsed.has(k) ? collapsed.delete(k) : collapsed.add(k);
+      b.parentElement.classList.toggle('open');
+    },
+    delClass(id) {
+      const c = D.classes.find(x => x.id === id);
+      confirmDelete('Sınıf Silme', c.class_name, 'silinsin mi?', 'Sil', async () => {
+        await DB.del('classes', id);
+        return 'Silindi.';
+      });
+    },
+    lessonLink(id) {
+      const l = D.lessons.find(x => x.id === id);
+      modal('Link Düzenle', l.lesson_name, `<input type="url" name="u" value="${esc(l.link_url)}" required>`, 'Kaydet', async f => {
+        await DB.put('lessons', { ...l, link_url: f.get('u') });
+        msg('ok', 'Güncellendi.');
+      });
+    },
+    assign(id) {
+      const u = D.users.find(x => x.id === id);
+      modal('Sınıf Ata', u.username, `<select name="c">${D.classes.map(c => `<option value="${c.id}">${c.class_name}</option>`).join('')}</select>`, 'Ata', async f => {
+        await DB.put('users', { ...u, class_id: +f.get('c') });
+        msg('ok', 'Atandı.');
+      });
+    },
+    creds(id) {
+      const u = D.users.find(x => x.id === id);
+      modal('Giriş Bilgileri', u.username, `<input name="un" value="${esc(u.username)}"><input name="pw" placeholder="Yeni şifre">`, 'Kaydet', async f => {
+        const username = f.get('un').trim(), pw = f.get('pw');
+        await DB.put('users', { ...u, username, ...(pw ? await DB.cred(pw) : {}) });
+        msg('ok', 'Güncellendi.');
+      });
+    },
+    delUser(id) {
+      const u = D.users.find(x => x.id === id);
+      confirmDelete('Öğrenci Sil', u.username, 'silinsin mi?', 'Sil', async () => { await DB.del('users', id); return 'Silindi.'; });
+    },
+    delOption(id) {
+      const o = D.options.find(x => x.id === id);
+      confirmDelete('Seçenek Sil', o.label, 'silinsin mi?', 'Sil', async () => { await DB.del('options', id); return 'Silindi.'; });
+    },
+    delLink(id) {
+      const l = D.links.find(x => x.id === id);
+      confirmDelete('Bağlantı Sil', l.button_text, 'silinsin mi?', 'Sil', async () => { await DB.del('links', id); return 'Silindi.'; });
+    }
+  };
+
+  app.addEventListener('submit', e => { e.preventDefault(); forms[e.target.dataset.f]?.(new FormData(e.target), e.target); });
+  document.addEventListener('click', e => {
+    if (e.target === modalEl) return closeModal();
+    const b = e.target.closest('[data-a]');
+    if (b) actions[b.dataset.a]?.(b.dataset.id ? +b.dataset.id : b);
+  });
+  document.addEventListener('change', e => {
+    if (e.target.id !== 'cat') return;
+    document.getElementById('nc').hidden = e.target.value !== '__new';
+  });
+  addEventListener('hashchange', () => { flash = null; render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
