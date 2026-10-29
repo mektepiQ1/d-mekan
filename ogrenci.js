@@ -45,7 +45,7 @@ const U = {
   const { esc, now, fd, matchClass, okUrl } = U;
   const app = document.getElementById('app');
   const LINKS = [
-    ['Ders Programım', 'https://mektepiq1.github.io/cay/dersprogram.html'],
+    ['Ders Programım', 'https://mektepiq1.github.io/d-mekan/dersprogram.html'],
     ['Defter', 'https://mektepiq1.github.io/cay/cizgilideff.html'],
     ['Deneme', 'https://denemelerburda.infinityfreeapp.com/soru.php']
   ];
