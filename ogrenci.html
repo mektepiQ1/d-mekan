@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e66">
+<meta name="robots" content="noindex, nofollow">
+<title>Öğrenci Paneli | Öğrenci Bahçesi</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌱%3C/text%3E%3C/svg%3E">
+<style>
+:root{--navy:#2c3e66;--navy-d:#1a2744;--text:#2d3748;--muted:#718096;--line:#e2e8f0;--soft:#f7fafc;--danger:#c53030;--grad:linear-gradient(135deg,var(--navy),var(--navy-d))}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#f5f7fa,#c3cfe2) fixed;min-height:100vh;min-height:100dvh;color:var(--text);overflow-wrap:anywhere;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.main{max-width:1280px;margin:0 auto;padding:32px 24px}
+.main.narrow{max-width:900px;padding-top:calc(24px + env(safe-area-inset-top))}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:2em;color:var(--navy);margin-bottom:8px}
+.header p{color:var(--muted)}
+.card{background:rgba(255,255,255,.98);border-radius:20px;padding:32px;box-shadow:0 10px 30px rgba(0,0,0,.08);margin-bottom:32px}
+.card h2{margin-bottom:24px;font-size:1.5em;border-left:3px solid var(--navy);padding-left:16px}
+.form-card{max-width:480px;margin:0 auto 32px;text-align:center}
+.form-card h2{border:0;padding:0;color:var(--navy);margin-bottom:8px}
+.form-card .sub-t{color:var(--muted);font-size:14px;margin-bottom:24px}
+.fg{margin-bottom:20px;text-align:left}
+label{display:block;margin-bottom:8px;color:#4a5568;font-weight:500;font-size:14px}
+input,select{width:100%;padding:12px 16px;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;font:inherit;font-size:16px}
+input:focus,select:focus{outline:0;border-color:var(--navy);box-shadow:0 0 0 3px rgba(44,62,102,.1);background:#fff}
+button{width:100%;padding:12px 28px;background:var(--grad);color:#fff;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:500;cursor:pointer}
+button:hover{opacity:.95}
+button.gray{background:var(--line);color:#4a5568;margin-top:12px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.alert{padding:14px 18px;border-radius:12px;margin-bottom:24px;font-size:14px;font-weight:500;text-align:left}
+.er{background:#fff5f5;color:var(--danger);border:1px solid #feb2b2}
+.empty{text-align:center;padding:48px 24px;color:#a0aec0;background:var(--soft);border-radius:16px}
+.wel{background:var(--grad);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.out{width:auto;padding:10px 20px;background:#edf2f7;color:#4a5568;border:1px solid var(--line);font-size:14px;font-weight:600}
+.navbar{background:#fff;border-radius:16px;margin-bottom:28px;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden}
+.nl{display:flex;list-style:none}
+.nl li{flex:1;text-align:center}
+.nl a{display:block;padding:16px 12px;color:#4a5568;font-weight:600;font-size:15px;text-decoration:none;border-bottom:3px solid transparent}
+.nl a:hover,.nl a.active{color:var(--navy);border-color:var(--navy);background:rgba(44,62,102,.05)}
+.class-card{background:var(--grad);color:#fff;padding:24px;border-radius:20px;margin-bottom:24px;text-align:center}
+.class-card h3{font-size:22px;margin-bottom:8px}
+.class-card p{opacity:.85;font-size:13px}
+.lbl{color:#4a5568;font-weight:600;margin:24px 0 16px}
+.slesson{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--soft);padding:16px 20px;margin:10px 0;border-radius:14px;border-left:4px solid var(--navy);font-weight:600}
+.btn{display:inline-block;padding:8px 18px;color:var(--navy);background:#fff;border:1.5px solid var(--navy);border-radius:20px;text-decoration:none;font-size:13px;font-weight:600}
+.btn:hover{background:var(--navy);color:#fff}
+.warn{background:#fff5f5;color:var(--danger);padding:18px;border-radius:14px;text-align:center;border:1px solid #feb2b2}
+</style>
+</head>
+<body>
+<main class="main narrow">
+  <div class="header">
+    <h1>Öğrenci Bahçesi</h1>
+    <p>Dersler, Defter ve Online Sınavlar</p>
+  </div>
+  <div id="app"></div>
+</main>
+
+<script type="module">
+'use strict';
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAtqtkB4mYY7t1HCM3umVLxRC2un30_-fQ",
+  authDomain: "ogrenciveyonetim.firebaseapp.com",
+  databaseURL: "https://ogrenciveyonetim-default-rtdb.firebaseio.com",
+  projectId: "ogrenciveyonetim",
+  storageBucket: "ogrenciveyonetim.firebasestorage.app",
+  messagingSenderId: "660345359561",
+  appId: "1:660345359561:web:5c74d90d8624c8e4c75118",
+  measurementId: "G-C7TN0GBJL3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const sha = async text => {
+  if (!crypto.subtle) return text;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+const DB = (() => {
+  return {
+    async all(store) {
+      const snap = await get(ref(db, store));
+      if (!snap.exists()) return [];
+      const val = snap.val();
+      if (Array.isArray(val)) return val.filter(Boolean);
+      return Object.entries(val).map(([k, v]) => ({ ...v, _fbKey: k }));
+    },
+    async get(store, id) {
+      const snap = await get(ref(db, `${store}/${id}`));
+      return snap.exists() ? snap.val() : null;
+    },
+    async put(store, item) {
+      if (store === 'session') {
+        await set(ref(db, `${store}/${item.key}`), item);
+        return item;
+      }
+      let key = item._fbKey;
+      if (!key) {
+        const items = await this.all(store);
+        const maxId = items.reduce((m, x) => Math.max(m, x.id || 0), 0);
+        item.id = item.id || (maxId + 1);
+        key = `item_${item.id}`;
+      }
+      await set(ref(db, `${store}/${key}`), { ...item, _fbKey: key });
+      return item;
+    },
+    async del(store, idOrKey) {
+      const items = await this.all(store);
+      const found = items.find(x => x.id === idOrKey || x._fbKey === idOrKey);
+      if (found && found._fbKey) {
+        await remove(ref(db, `${store}/${found._fbKey}`));
+      } else {
+        await remove(ref(db, `${store}/${idOrKey}`));
+      }
+    },
+    async verify(user, password) {
+      return (await sha(user.salt + password)) === user.hash;
+    }
+  };
+})();
+
+const U = {
+  esc: s => String(s == null ? '' : s).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';'),
+  now: () => new Date().toISOString(),
+  fd(iso, withTime = true) {
+    const d = new Date(iso), p = n => String(n).padStart(2, '0');
+    const date = `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`;
+    return withTime ? `${date} ${p(d.getHours())}:${p(d.getMinutes())}` : date;
+  },
+  matchClass(classes, exam, edu) {
+    const norm = s => String(s).toLocaleLowerCase('tr').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ı/g, 'i').trim();
+    const has = (name, term) => !!term &&
+      new RegExp('(^|[^a-z0-9])' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-z0-9])').test(name);
+    const e = norm(exam), l = norm(edu);
+    let best, top = 0;
+    for (const c of [...classes].sort((x, y) => x.id - y.id)) {
+      const n = norm(c.class_name), score = (has(n, e) ? 2 : 0) + (has(n, l) ? 1 : 0);
+      if (score > top) { best = c; top = score; }
+    }
+    return best;
+  }
+};
+
+(() => {
+  const { esc, now, fd, matchClass } = U;
+  const app = document.getElementById('app');
+  const SESSION_KEY = 'current';
+  const LINKS = [
+    ['Ders Programım', 'https://mektepiq1.github.io/cay/dersprogram.html'],
+    ['Defter', 'https://mektepiq1.github.io/cay/cizgilideff.html'],
+    ['Deneme', 'https://denemelerburda.infinityfreeapp.com/soru.php']
+  ];
+  let error = '', lastUser = '';
+
+  const errorHtml = () => {
+    const e = error; error = '';
+    return e ? `<div class="alert er">${esc(e)}</div>` : '';
+  };
+
+  const loginView = () => `
+    <div class="card form-card">
+      <h2>Hoş Geldiniz</h2>
+      <p class="sub-t">Sisteme erişmek için giriş yapın</p>
+      ${errorHtml()}
+      <form data-f="login">
+        <div class="fg"><label>Kullanıcı Adı</label>
+          <input name="un" required autocomplete="username" value="${esc(lastUser)}"></div>
+        <div class="fg"><label>Şifre</label>
+          <input name="pw" type="password" required autocomplete="current-password"></div>
+        <button>Giriş Yap</button>
+      </form>
+    </div>`;
+
+  const welcome = user => `
+    <div class="top">
+      <div class="wel">Hoş Geldin, ${esc(user.username)}!</div>
+      <button class="out" data-a="logout">Çıkış Yap</button>
+    </div>`;
+
+  const optionTags = list => list.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+
+  const profileView = (user, opts) => `
+    <div class="card">${welcome(user)}
+      <div class="card form-card" style="box-shadow:none;border:1px solid var(--line)">
+        <h2>Profilinizi Tamamlayın</h2>
+        ${errorHtml()}` +
+        (opts.exam.length && opts.edu.length ? `
+        <form data-f="profile">
+          <div class="fg"><label>Sınav Seçiniz:</label>
+            <select name="exam" required><option value="">-- Seçiniz --</option>${optionTags(opts.exam)}</select></div>
+          <div class="fg"><label>Öğrenim Durumunuz:</label>
+            <select name="education_status" required><option value="">-- Seçiniz --</option>${optionTags(opts.edu)}</select></div>
+          <button>Kaydet ve Devam Et</button>
+        </form>` : `<div class="warn"><p>Seçenekler henüz eklenmemiş.</p></div>`) + `
+      </div>
+    </div>`;
+
+  const panelView = (user, cls, lessons) => `
+    <div class="card">${welcome(user)}
+      <nav class="navbar"><ul class="nl">
+        <li><a class="active" href="ogrenci.html">Sınıfım ve Derslerim</a></li>
+        ${LINKS.map(([t, u]) => `<li><a href="${u}">${t}</a></li>`).join('')}
+      </ul></nav>
+      <h2>Sınıfım ve Derslerim</h2>` +
+    (cls ? `
+      <div class="class-card"><h3>${esc(cls.class_name)}</h3><p>Kayıt: ${fd(cls.created_at, false)}</p></div>
+      <div class="lbl">Derslerim:</div>` +
+      (lessons.length ? lessons.map(l => `
+        <div class="slesson"><span>${esc(l.lesson_name)}</span>
+          ${l.link_url ? `<a class="btn" href="${esc(l.link_url)}" target="_blank" rel="noopener noreferrer">İncele</a>` : ''}</div>`).join('')
+        : '<div class="empty"><p>Ders eklenmemiş.</p></div>')
+      : `<div class="warn"><p>Sınıfınız henüz atanmadı.</p></div>`) + '</div>';
+
+  async function currentUser() {
+    const s = await DB.get('session', SESSION_KEY);
+    return s ? DB.get('users', s.uid) : undefined;
+  }
+
+  async function render() {
+    const user = await currentUser();
+    if (!user) return void (app.innerHTML = loginView());
+    if (!user.exam || !user.education_status) {
+      const opts = (await DB.all('options')).sort((a, b) => a.id - b.id);
+      const by = type => opts.filter(o => o.type === type).map(o => o.label);
+      return void (app.innerHTML = profileView(user, { exam: by('exam'), edu: by('edu') }));
+    }
+    const [classes, lessons] = await Promise.all([DB.all('classes'), DB.all('lessons')]);
+    const cls = classes.find(c => c.id === user.class_id);
+    app.innerHTML = panelView(user, cls, cls ? lessons.filter(l => l.class_id === cls.id).sort((a, b) => b.id - a.id) : []);
+  }
+
+  const forms = {
+    async login(d) {
+      const un = d.get('un').trim().toLowerCase();
+      const user = (await DB.all('users')).find(u => u.username.toLowerCase() === un);
+      if (user && await DB.verify(user, d.get('pw'))) {
+        await DB.put('session', { key: SESSION_KEY, uid: user._fbKey || user.id, at: now() });
+      } else {
+        error = 'Kullanıcı adı veya şifre hatalı.';
+        lastUser = d.get('un').trim();
+      }
+    },
+    async profile(d) {
+      const user = await currentUser();
+      const exam = d.get('exam'), edu = d.get('education_status');
+      if (!user || !exam || !edu) return;
+      const match = matchClass(await DB.all('classes'), exam, edu);
+      await DB.put('users', { ...user, exam, education_status: edu, class_id: match ? match.id : user.class_id });
+    }
+  };
+
+  app.addEventListener('submit', async e => {
+    e.preventDefault();
+    await forms[e.target.dataset.f]?.(new FormData(e.target));
+    render();
+  });
+
+  app.addEventListener('click', async e => {
+    if (e.target.closest('[data-a]')?.dataset.a !== 'logout') return;
+    await DB.del('session', SESSION_KEY);
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
