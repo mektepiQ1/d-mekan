@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Bahçesi | Soru Bankası Yönetimi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            background: linear-gradient(145deg, #f0f4fc 0%, #e9eefa 100%);
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 12px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @media (min-width: 768px) { body { padding: 20px; } }
+        .main-container { max-width: 1600px; margin: 0 auto; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.06);
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #eef2f9;
+        }
+        @media (min-width: 768px) { .glass-card { padding: 32px; } }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        @media (min-width: 768px) { .header h1 { font-size: 2.4rem; } }
+        .header p { color: #6c757d; font-size: 0.9rem; }
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #eef2f9;
+            transition: all 0.2s;
+            height: 100%;
+        }
+        @media (min-width: 768px) { .stat-card { padding: 16px; } }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px -6px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 1.5rem; font-weight: 800; color: #1e2b5c; margin: 8px 0; }
+        .stat-card p { font-size: 0.8rem; margin: 0; }
+        @media (min-width: 768px) { .stat-card h3 { font-size: 2rem; } .stat-card p { font-size: 1rem; } }
+        .nav-tabs-custom {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            border-bottom: 2px solid #e2e8f2;
+            margin-bottom: 20px;
+            padding-bottom: 6px;
+            list-style: none;
+        }
+        .nav-tabs-custom .nav-link {
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4a5b7a;
+            background: transparent;
+        }
+        @media (min-width: 576px) { .nav-tabs-custom .nav-link { padding: 10px 24px; font-size: 0.9rem; } }
+        .nav-tabs-custom .nav-link i { margin-right: 6px; }
+        .nav-tabs-custom .nav-link.active {
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            color: white;
+        }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table { font-size: 0.85rem; }
+        .table td, .table th { vertical-align: middle; }
+        .btn-professional { border-radius: 40px; padding: 10px 24px; font-weight: 600; }
+        .form-control, .form-select { border-radius: 12px; border: 1.5px solid #e2e8f2; padding: 8px 14px; font-size: 16px; min-height: 44px; }
+        .btn { min-height: 40px; }
+        .accordion-button { font-size: 0.9rem; padding: 14px 18px; }
+        @media (min-width: 768px) { .accordion-button { font-size: 1rem; padding: 18px 24px; } }
+
+        /* Giriş */
+        .giris-kutusu { max-width: 440px; margin: 40px auto; text-align: center; }
+        .btn-giris { background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%); border: none; color: #fff; border-radius: 40px; padding: 12px 24px; font-weight: 600; width: 100%; }
+        .btn-giris:hover { color: #fff; opacity: .92; }
+        .oturum-satiri { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 16px; font-size: 0.85rem; color: #4a5b7a; }
+        .oturum-satiri span { overflow-wrap: anywhere; }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="header">
+        <h1><i class="fas fa-graduation-cap"></i> Öğrenci Bahçesi Yönetim Paneli</h1>
+        <p>Konu ve Test İşlemleri, Toplu Soru Ekleme</p>
+    </div>
+
+    <div id="mesajKutusu"></div>
+
+    <!-- GİRİŞ -->
+    <div id="girisAlani" class="giris-kutusu glass-card">
+        <i class="fas fa-lock fa-2x mb-3" style="color:#1e2b5c"></i>
+        <p class="mb-3">Yönetim paneline erişmek için e-posta ve şifrenizle giriş yapın.</p>
+        <form id="formGiris" class="text-start" onsubmit="return window.__girisHazir ? true : (document.getElementById('girisHata').textContent = 'Sayfa betikleri yüklenemedi (Firebase). İnternet bağlantınızı kontrol edip sayfayı yenileyin.', false)" novalidate>
+            <div class="mb-3">
+                <input type="email" class="form-control" id="girisEposta" placeholder="E-posta" autocomplete="username" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="girisSifre" placeholder="Şifre" autocomplete="current-password" required>
+            </div>
+            <button type="submit" id="btnGiris" class="btn btn-giris"><i class="fas fa-right-to-bracket me-2"></i> Giriş Yap</button>
+        </form>
+        <div id="girisHata" class="small text-danger mt-3"></div>
+    </div>
+
+    <!-- PANEL -->
+    <div id="panelAlani" style="display:none">
+        <div class="oturum-satiri">
+            <span><i class="fas fa-user-check me-1"></i> <span id="oturumEposta"></span></span>
+            <button id="btnCikis" class="btn btn-outline-secondary btn-sm"><i class="fas fa-right-from-bracket"></i> Çıkış</button>
+        </div>
+
+        <div class="row g-2 g-md-3 mb-4">
+            <div class="col-4">
+                <div class="stat-card" data-git="liste-tab">
+                    <i class="fas fa-book-open"></i>
+                    <h3 id="statKonu">0</h3>
+                    <p>Toplam Konu</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-card" data-git="liste-tab">
+                    <i class="fas fa-folder"></i>
+                    <h3 id="statTest">0</h3>
+                    <p>Toplam Test</p>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-card" data-git="liste-tab">
+                    <i class="fas fa-question-circle"></i>
+                    <h3 id="statSoru">0</h3>
+                    <p>Toplam Soru</p>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs-custom" id="myTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="konu-test-tab" data-bs-toggle="tab" data-bs-target="#konu-test" type="button">
+                    <i class="fas fa-folder-plus"></i> 1. Konu ve Test İşlemleri
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="toplu-tab" data-bs-toggle="tab" data-bs-target="#toplu" type="button">
+                    <i class="fas fa-copy"></i> 2. Toplu Soru Ekle
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="liste-tab" data-bs-toggle="tab" data-bs-target="#liste" type="button">
+                    <i class="fas fa-table-list"></i> Liste
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- 1. KONU VE TEST İŞLEMLERİ -->
+            <div class="tab-pane fade show active" id="konu-test">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h3 class="h5 mb-3"><i class="fas fa-folder-plus"></i> Yeni Konu Ekle</h3>
+                            <form id="formKonuEkle">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="konuAdi" placeholder="Konu Adı (Örn: Matematik)" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Konu Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="glass-card">
+                            <h3 class="h5 mb-3"><i class="fas fa-file-alt"></i> Test Ekle</h3>
+                            <form id="formTestEkle">
+                                <div class="mb-3">
+                                    <select class="form-select" id="testKonuSec" required>
+                                        <option value="">Hangi Konuya Ait? Seçin</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="testAdi" placeholder="Test Adı (Örn: 1. Hafta Testi)" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Test Ekle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. TOPLU SORU EKLE -->
+            <div class="tab-pane fade" id="toplu">
+                <div class="glass-card">
+                    <h3 class="h5 mb-2">30 Soruluk Toplu Ekleme</h3>
+                    <p class="small text-muted mb-3">Önce test seçin, sonra soruları doldurun</p>
+                    <form id="formTopluSoru">
+                        <div class="mb-3">
+                            <select class="form-select" id="topluTestSec" required>
+                                <option value="">Hangi Teste Ait? Seçin</option>
+                            </select>
+                        </div>
+                        <div class="accordion" id="soruAccordion"></div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-professional" id="btnTopluKaydet">
+                                <i class="fas fa-save"></i> Tüm Soruları Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- LİSTE -->
+            <div class="tab-pane fade" id="liste">
+                <div class="glass-card">
+                    <h4 class="h5 mb-3"><i class="fas fa-book"></i> Konular</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Konu Adı</th><th>Test Sayısı</th><th>İşlem</th></tr></thead>
+                            <tbody id="tabloKonular"></tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h4 class="h5 mb-3"><i class="fas fa-folder"></i> Testler</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Konu</th><th>Test Adı</th><th>Soru Sayısı</th><th>İşlem</th></tr></thead>
+                            <tbody id="tabloTestler"></tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h4 class="h5 mb-3"><i class="fas fa-question-circle"></i> Tüm Sorular</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Konu</th><th>Test</th><th>Soru</th><th>Doğru</th><th>İşlem</th></tr></thead>
+                            <tbody id="tabloSorular"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, push, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAAvvNSnaFNaDfh2nujq7ppbtw-y079ugE",
+        authDomain: "kpisesorubanka.firebaseapp.com",
+        projectId: "kpisesorubanka",
+        storageBucket: "kpisesorubanka.firebasestorage.app",
+        messagingSenderId: "1046349867430",
+        appId: "1:1046349867430:web:dd053d150f0b0617244767",
+        measurementId: "G-2SM053RDD2",
+        // Konsolda Realtime Database > Data sekmesinde görünen adresle aynı olmalı
+        databaseURL: "https://kpisesorubanka-default-rtdb.firebaseio.com"
+    };
+    const ADMIN_UID = "AhA1nLtoXUT1lnZFCRITIyWCj602";
+
+    window.__girisHazir = true;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const zaman = x => x.olusturma || 0;
+    const $ = id => document.getElementById(id);
+
+    let konular = [], testler = [], sorular = [];
+
+    function mesajGoster(text, tip = 'success') {
+        const kutu = $('mesajKutusu');
+        kutu.innerHTML = `<div class="alert alert-${tip}">${text}</div>`;
+        setTimeout(() => kutu.innerHTML = '', tip === 'info' ? 9000 : 3500);
+    }
+
+    // ---------- Giriş / Çıkış ----------
+    $('formGiris').addEventListener('submit', async e => {
+        e.preventDefault();
+        $('girisHata').textContent = 'Giriş yapılıyor...';
+        const btn = $('btnGiris');
+        btn.disabled = true;
+        try {
+            await signInWithEmailAndPassword(auth, $('girisEposta').value.trim(), $('girisSifre').value);
+            $('girisSifre').value = '';
+        } catch (err) {
+            console.error(err);
+            const hatalar = {
+                'auth/invalid-credential': 'E-posta veya şifre hatalı.',
+                'auth/invalid-email': 'Geçersiz e-posta adresi.',
+                'auth/user-disabled': 'Bu hesap devre dışı bırakılmış.',
+                'auth/too-many-requests': 'Çok fazla deneme yapıldı, biraz sonra tekrar deneyin.',
+                'auth/operation-not-allowed': 'Firebase\'de E-posta/Şifre girişi etkin değil.'
+            };
+            $('girisHata').textContent = hatalar[err.code] || ('Giriş yapılamadı: ' + (err.code || err.message));
+        }
+        btn.disabled = false;
+    });
+    $('btnCikis').addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, async user => {
+        if (!user) {
+            $('girisAlani').style.display = '';
+            $('panelAlani').style.display = 'none';
+            return;
+        }
+        if (user.uid !== ADMIN_UID) {
+            $('girisAlani').style.display = '';
+            $('panelAlani').style.display = 'none';
+            $('girisHata').innerHTML = `Bu hesap yönetici değil.<br>Hesabınızın UID değeri: <strong>${esc(user.uid)}</strong>`;
+            await signOut(auth);
+            return;
+        }
+        $('girisAlani').style.display = 'none';
+        $('panelAlani').style.display = '';
+        $('oturumEposta').textContent = user.email || user.uid;
+        await verileriYukle();
+        aktarimBildirimi();
+    });
+
+    // ---------- Veri ----------
+    async function verileriYukle() {
+        try {
+            const [k, t, s] = await Promise.all(
+                ['konular', 'testler', 'sorular'].map(ad => get(ref(db, ad)))
+            );
+            const liste = snap => Object.entries(snap.val() || {}).map(([id, v]) => ({ id, ...v }));
+            konular = liste(k).sort((a, b) => zaman(a) - zaman(b));
+            testler = liste(t).sort((a, b) => zaman(a) - zaman(b));
+            sorular = liste(s).sort((a, b) => (a.sira || 0) - (b.sira || 0));
+            paneliYenile();
+        } catch (err) {
+            console.error(err);
+            mesajGoster('❌ Veriler okunamadı: ' + esc(err.code || err.message), 'danger');
+        }
+    }
+
+    // 30 soruluk form
+    let accordionHTML = '';
+    for (let i = 1; i <= 30; i++) {
+        accordionHTML += `
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">
+                    Soru ${i}
+                </button>
+            </h2>
+            <div id="collapse${i}" class="accordion-collapse collapse" data-bs-parent="#soruAccordion">
+                <div class="accordion-body">
+                    <div class="row g-2">
+                        <div class="col-12"><textarea class="form-control" id="t_soru_${i}" rows="2" placeholder="${i}. soruyu yazın..."></textarea></div>
+                        <div class="col-md-6"><input type="text" class="form-control" id="t_cevap_a_${i}" placeholder="A şıkkı"></div>
+                        <div class="col-md-6"><input type="text" class="form-control" id="t_cevap_b_${i}" placeholder="B şıkkı"></div>
+                        <div class="col-md-6"><input type="text" class="form-control" id="t_cevap_c_${i}" placeholder="C şıkkı"></div>
+                        <div class="col-md-6"><input type="text" class="form-control" id="t_cevap_d_${i}" placeholder="D şıkkı"></div>
+                        <div class="col-12"><input type="text" class="form-control" id="t_cevap_e_${i}" placeholder="E şıkkı"></div>
+                        <div class="col-12">
+                            <select class="form-select" id="t_dogru_${i}">
+                                <option value="A">Doğru: A</option>
+                                <option value="B">Doğru: B</option>
+                                <option value="C">Doğru: C</option>
+                                <option value="D">Doğru: D</option>
+                                <option value="E">Doğru: E</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+    $('soruAccordion').innerHTML = accordionHTML;
+
+    // ---------- metinoku.html'den aktarılan soruları forma doldur ----------
+    const AKTARIM_ANAHTARI = 'soruAdminAktarim';
+    let aktarimSayisi = 0;
+
+    function aktarimiUygula() {
+        let paket = null;
+        try {
+            const ham = localStorage.getItem(AKTARIM_ANAHTARI);
+            if (ham) paket = JSON.parse(ham);
+        } catch (err) {
+            console.error('Aktarım okunamadı:', err);
+            return;
+        }
+        if (!paket || !Array.isArray(paket.sorular) || !paket.sorular.length) return;
+
+        paket.sorular.slice(0, 30).forEach((q, idx) => {
+            const i = idx + 1;
+            const yaz = (id, deger) => { const el = $(id); if (el) el.value = deger ?? ''; };
+            yaz(`t_soru_${i}`, q.soru);
+            yaz(`t_cevap_a_${i}`, q.a);
+            yaz(`t_cevap_b_${i}`, q.b);
+            yaz(`t_cevap_c_${i}`, q.c);
+            yaz(`t_cevap_d_${i}`, q.d);
+            yaz(`t_cevap_e_${i}`, q.e);
+            if (['A', 'B', 'C', 'D', 'E'].includes(q.dogru)) yaz(`t_dogru_${i}`, q.dogru);
+            aktarimSayisi++;
+        });
+
+        // Bir kez uygulandıktan sonra sil (sayfa yenilenince tekrar dolmasın)
+        try { localStorage.removeItem(AKTARIM_ANAHTARI); } catch (err) {}
+    }
+    aktarimiUygula();
+
+    function aktarimBildirimi() {
+        if (!aktarimSayisi) return;
+        $('toplu-tab').click();
+        mesajGoster(`📥 metinoku sayfasından ${aktarimSayisi} soru forma aktarıldı. Lütfen yukarıdan <strong>testi seçin</strong> ve "Tüm Soruları Kaydet" düğmesine basın.`, 'info');
+        aktarimSayisi = 0;
+    }
+
+    function paneliYenile() {
+        $('statKonu').innerText = konular.length;
+        $('statTest').innerText = testler.length;
+        $('statSoru').innerText = sorular.length;
+
+        $('testKonuSec').innerHTML = '<option value="">Hangi Konuya Ait? Seçin</option>' +
+            konular.map(k => `<option value="${k.id}">${esc(k.konu_adi)}</option>`).join('');
+
+        $('topluTestSec').innerHTML = '<option value="">Hangi Teste Ait? Seçin</option>' +
+            testler.map(t => {
+                const k = konular.find(x => x.id == t.konu_id);
+                return `<option value="${t.id}">${esc(k ? k.konu_adi : 'Bilinmeyen')} - ${esc(t.test_adi)}</option>`;
+            }).join('');
+
+        $('tabloKonular').innerHTML = konular.map((k, i) => {
+            const n = testler.filter(t => t.konu_id == k.id).length;
+            return `<tr><td>${i + 1}</td><td><strong>${esc(k.konu_adi)}</strong></td><td><span class="badge bg-info">${n} test</span></td><td><button class="btn btn-danger btn-sm" data-sil="konu" data-id="${k.id}"><i class="fas fa-trash"></i> Sil</button></td></tr>`;
+        }).join('');
+
+        $('tabloTestler').innerHTML = testler.map((t, i) => {
+            const k = konular.find(x => x.id == t.konu_id);
+            const n = sorular.filter(s => s.test_id == t.id).length;
+            return `<tr><td>${i + 1}</td><td>${esc(k ? k.konu_adi : '')}</td><td><strong>${esc(t.test_adi)}</strong></td><td><span class="badge bg-secondary">${n} soru</span></td><td><button class="btn btn-danger btn-sm" data-sil="test" data-id="${t.id}"><i class="fas fa-trash"></i> Sil</button></td></tr>`;
+        }).join('');
+
+        $('tabloSorular').innerHTML = sorular.map((s, i) => {
+            const t = testler.find(x => x.id == s.test_id);
+            const k = t ? konular.find(x => x.id == t.konu_id) : null;
+            const metin = (s.soru_metni || '');
+            return `<tr><td>${i + 1}</td><td>${esc(k ? k.konu_adi : '')}</td><td>${esc(t ? t.test_adi : '')}</td><td>${esc(metin.substring(0, 50))}${metin.length > 50 ? '...' : ''}</td><td><strong>${esc(s.dogru_cevap)}</strong></td><td><button class="btn btn-danger btn-sm" data-sil="soru" data-id="${s.id}"><i class="fas fa-trash"></i> Sil</button></td></tr>`;
+        }).join('');
+    }
+
+    // Stat kartları → Liste sekmesi
+    document.querySelectorAll('.stat-card').forEach(c =>
+        c.addEventListener('click', () => $(c.dataset.git).click())
+    );
+
+    // Silme butonları (olay delegasyonu)
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('[data-sil]');
+        if (!btn) return;
+        const { sil, id } = btn.dataset;
+        if (sil === 'konu') konuSil(id);
+        else if (sil === 'test') testSil(id);
+        else if (sil === 'soru') soruSil(id);
+    });
+
+    // ---------- Ekleme ----------
+    $('formKonuEkle').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const btn = this.querySelector('button[type=submit]');
+        btn.disabled = true;
+        try {
+            await push(ref(db, 'konular'), {
+                konu_adi: $('konuAdi').value.trim(),
+                olusturma: serverTimestamp()
+            });
+            this.reset();
+            mesajGoster('✅ Konu başarıyla eklendi!');
+            await verileriYukle();
+        } catch (err) {
+            mesajGoster('❌ Konu eklenemedi: ' + esc(err.code || err.message), 'danger');
+        }
+        btn.disabled = false;
+    });
+
+    $('formTestEkle').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const btn = this.querySelector('button[type=submit]');
+        btn.disabled = true;
+        try {
+            await push(ref(db, 'testler'), {
+                konu_id: $('testKonuSec').value,
+                test_adi: $('testAdi').value.trim(),
+                olusturma: serverTimestamp()
+            });
+            this.reset();
+            mesajGoster('✅ Test başarıyla eklendi!');
+            await verileriYukle();
+        } catch (err) {
+            mesajGoster('❌ Test eklenemedi: ' + esc(err.code || err.message), 'danger');
+        }
+        btn.disabled = false;
+    });
+
+    $('formTopluSoru').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const test_id = $('topluTestSec').value;
+        if (!test_id) return alert('Lütfen test seçin!');
+
+        const mevcutSira = sorular.filter(s => s.test_id == test_id).reduce((m, s) => Math.max(m, s.sira || 0), 0);
+        const guncelleme = {};
+        let eklenen = 0;
+
+        for (let i = 1; i <= 30; i++) {
+            const soru_metni = $(`t_soru_${i}`).value.trim();
+            if (soru_metni) {
+                eklenen++;
+                guncelleme['sorular/' + push(ref(db, 'sorular')).key] = {
+                    test_id,
+                    soru_metni,
+                    cevap_a: $(`t_cevap_a_${i}`).value,
+                    cevap_b: $(`t_cevap_b_${i}`).value,
+                    cevap_c: $(`t_cevap_c_${i}`).value,
+                    cevap_d: $(`t_cevap_d_${i}`).value,
+                    cevap_e: $(`t_cevap_e_${i}`).value,
+                    dogru_cevap: $(`t_dogru_${i}`).value,
+                    sira: mevcutSira + eklenen,
+                    olusturma: serverTimestamp()
+                };
+            }
+        }
+        if (eklenen === 0) return mesajGoster('⚠️ Eklenecek soru yazmadınız.', 'warning');
+
+        const btn = $('btnTopluKaydet');
+        btn.disabled = true;
+        try {
+            await update(ref(db), guncelleme);
+            this.reset();
+            mesajGoster(`✅ ${eklenen} soru başarıyla eklendi!`);
+            await verileriYukle();
+        } catch (err) {
+            mesajGoster('❌ Sorular kaydedilemedi: ' + esc(err.code || err.message), 'danger');
+        }
+        btn.disabled = false;
+    });
+
+    // ---------- Silme ----------
+    async function topluSil(yollar) {
+        const guncelleme = {};
+        yollar.forEach(y => guncelleme[y] = null);
+        await update(ref(db), guncelleme);
+    }
+
+    async function konuSil(id) {
+        if (!confirm('Konu, altındaki tüm testler ve sorular silinecek!')) return;
+        try {
+            const testIds = testler.filter(t => t.konu_id == id).map(t => t.id);
+            const refs = [
+                ...sorular.filter(s => testIds.includes(s.test_id)).map(s => 'sorular/' + s.id),
+                ...testIds.map(tid => 'testler/' + tid),
+                'konular/' + id
+            ];
+            await topluSil(refs);
+            mesajGoster('✅ Konu ve bağlı öğeler silindi.');
+            await verileriYukle();
+        } catch (err) {
+            mesajGoster('❌ Silinemedi: ' + esc(err.code || err.message), 'danger');
+        }
+    }
+
+    async function testSil(id) {
+        if (!confirm('Test ve içindeki sorular silinecek!')) return;
+        try {
+            const refs = [
+                ...sorular.filter(s => s.test_id == id).map(s => 'sorular/' + s.id),
+                'testler/' + id
+            ];
+            await topluSil(refs);
+            mesajGoster('✅ Test silindi.');
+            await verileriYukle();
+        } catch (err) {
+            mesajGoster('❌ Silinemedi: ' + esc(err.code || err.message), 'danger');
+        }
+    }
+
+    async function soruSil(id) {
+        if (!confirm('Soru silinsin mi?')) return;
+        try {
+            await topluSil(['sorular/' + id]);
+            mesajGoster('✅ Soru silindi.');
+            await verileriYukle();
+        } catch (err) {
+            mesajGoster('❌ Silinemedi: ' + esc(err.code || err.message), 'danger');
+        }
+    }
+</script>
+<script>
+    // Hata teşhisi: beklenmeyen hataları giriş kutusunda göster
+    (function () {
+        const goster = m => { const k = document.getElementById('girisHata'); if (k) k.textContent = m; };
+        window.addEventListener('error', e => goster('Hata: ' + (e.message || 'betik yüklenemedi')));
+        window.addEventListener('unhandledrejection', e => goster('Hata: ' + ((e.reason && (e.reason.code || e.reason.message)) || e.reason)));
+        const m = document.querySelector('script[type="module"]');
+        if (m) m.addEventListener('error', () => goster('Firebase dosyaları yüklenemedi. Sayfayı yenileyin veya başka bir ağ/tarayıcı deneyin.'));
+    })();
+</script>
+</body>
+</html>
