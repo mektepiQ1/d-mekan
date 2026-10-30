@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Bahçesi | Metinden Soru Ayrıştırıcı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            background: linear-gradient(145deg, #f0f4fc 0%, #e9eefa 100%);
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 12px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @media (min-width: 768px) { body { padding: 20px; } }
+        .main-container { max-width: 1000px; margin: 0 auto; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.06);
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #eef2f9;
+        }
+        @media (min-width: 768px) { .glass-card { padding: 32px; } }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        @media (min-width: 768px) { .header h1 { font-size: 2.4rem; } }
+        .header p { color: #6c757d; font-size: 0.9rem; }
+
+        .form-control, .form-select { border-radius: 12px; border: 1.5px solid #e2e8f2; padding: 8px 14px; font-size: 16px; min-height: 44px; }
+        .input-group-text { border-radius: 12px 0 0 12px; border: 1.5px solid #e2e8f2; font-weight: 600; min-width: 42px; justify-content: center; }
+        .input-group > .form-control { border-radius: 0 12px 12px 0; }
+        .btn { min-height: 40px; }
+        .btn-professional { border-radius: 40px; padding: 10px 24px; font-weight: 600; }
+        .btn-lacivert {
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            border: none; color: #fff;
+        }
+        .btn-lacivert:hover, .btn-lacivert:focus { color: #fff; opacity: .92; }
+        .btn-lacivert:disabled { opacity: .5; color: #fff; }
+
+        #metin { min-height: 260px; font-size: 16px; line-height: 1.5; resize: vertical; }
+        .ipucu { font-size: 0.82rem; color: #6c757d; }
+        .ipucu code { background: #eef2f9; color: #1e2b5c; padding: 1px 6px; border-radius: 6px; }
+
+        /* Sayaç */
+        .sayac-rozet { font-size: 1rem; font-weight: 700; color: #1e2b5c; }
+        .progress { height: 10px; border-radius: 10px; background: #e9eefa; }
+        .progress-bar { background: linear-gradient(90deg, #1e2b5c, #2d3a6e); transition: width .25s; }
+        .progress-bar.dolu { background: #198754; }
+
+        /* Soru kartı */
+        .soru-karti {
+            background: #fff;
+            border: 1px solid #e2e8f2;
+            border-left: 4px solid #1e2b5c;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .soru-karti.uyarili { border-left-color: #f0ad4e; }
+        .sira-rozet {
+            width: 32px; height: 32px; flex: 0 0 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            color: #fff; font-weight: 700; font-size: .9rem;
+        }
+        .soru-metin { white-space: pre-line; overflow-wrap: anywhere; margin: 8px 0; color: #1f2937; }
+        .sik-satir {
+            display: flex; gap: 8px; padding: 4px 8px; border-radius: 8px;
+            font-size: .92rem; overflow-wrap: anywhere;
+        }
+        .sik-satir b { flex: 0 0 auto; color: #1e2b5c; }
+        .sik-satir.dogru { background: #e8f6ee; }
+        .sik-satir.dogru b { color: #146c43; }
+        .sik-satir.bos { color: #9aa5b8; font-style: italic; }
+        .rozet-uyari { font-size: .75rem; font-weight: 600; }
+        .bos-durum { text-align: center; color: #6c757d; padding: 28px 8px; }
+        .aktar-alani { text-align: center; }
+        .btn-aktar { width: 100%; padding: 18px 24px; font-size: 1.15rem; border-radius: 40px; font-weight: 700; }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="header">
+        <h1><i class="fas fa-file-lines"></i> Metinden Soru Ayrıştırıcı</h1>
+        <p>Soruları şıklarıyla birlikte yapıştırın, havuzda toplayın, soruadmin formuna aktarın</p>
+    </div>
+
+    <!-- 1. METİN YAPIŞTIR -->
+    <div class="glass-card">
+        <h2 class="h5 mb-2"><i class="fas fa-paste"></i> 1. Metni Yapıştır</h2>
+        <p class="ipucu mb-3">
+            Her soru bir numarayla başlamalı (<code>1.</code> <code>1)</code> <code>1-</code> <code>Soru 1:</code>),
+            şıklar <code>A)</code> <code>A.</code> <code>(A)</code> biçiminde olabilir; alt alta ya da aynı satırda yazılabilir.
+            Cevap için soru sonuna <code>Cevap: C</code> veya metnin sonuna <code>Cevap Anahtarı: 1-A 2-C</code> yazarsanız doğru şık otomatik seçilir.
+        </p>
+        <textarea id="metin" class="form-control mb-3" placeholder="1. Aşağıdakilerden hangisi bir meyvedir?&#10;A) Havuç&#10;B) Elma&#10;C) Patates&#10;D) Soğan&#10;E) Ispanak&#10;&#10;2. İkinci soru..." aria-label="Soru metni"></textarea>
+
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" role="switch" id="satirBirlestir">
+            <label class="form-check-label small" for="satirBirlestir">
+                PDF'den kopyaladım: soru metnindeki satır sonlarını birleştir
+            </label>
+        </div>
+
+        <div class="d-grid gap-2 d-sm-flex">
+            <button type="button" id="btnAyristir" class="btn btn-lacivert btn-professional flex-sm-grow-1">
+                <i class="fas fa-wand-magic-sparkles"></i> Metni Ayrıştır ve Havuza Ekle
+            </button>
+            <button type="button" id="btnOrnek" class="btn btn-outline-secondary btn-professional">
+                <i class="fas fa-flask"></i> Örnek Metin
+            </button>
+            <button type="button" id="btnMetinTemizle" class="btn btn-outline-secondary btn-professional">
+                <i class="fas fa-eraser"></i> Kutuyu Temizle
+            </button>
+        </div>
+        <div id="bildirim" class="mt-3" aria-live="polite"></div>
+    </div>
+
+    <!-- 2. SORU HAVUZU -->
+    <div class="glass-card">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <h2 class="h5 mb-0"><i class="fas fa-layer-group"></i> 2. Soru Havuzu</h2>
+            <span class="sayac-rozet" id="sayac">0 / 30</span>
+        </div>
+        <div class="progress mb-3" role="progressbar" aria-label="Havuz doluluğu">
+            <div class="progress-bar" id="ilerleme" style="width:0%"></div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button type="button" id="btnBosSoru" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-plus"></i> Boş Soru Ekle
+            </button>
+            <button type="button" id="btnHavuzTemizle" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash"></i> Havuzu Boşalt
+            </button>
+        </div>
+
+        <div id="bosDurum" class="bos-durum">
+            <i class="fas fa-inbox fa-2x mb-2"></i>
+            <p>Havuz boş. Yukarıya soru metni yapıştırıp ayrıştırın.</p>
+        </div>
+        <div id="havuzListe"></div>
+    </div>
+
+    <!-- 3. AKTAR -->
+    <div class="glass-card aktar-alani">
+        <div id="aktarBildirim" class="mb-3" aria-live="polite"></div>
+        <button type="button" id="btnAktar" class="btn btn-lacivert btn-aktar" disabled>
+            <i class="fas fa-paper-plane"></i> soruadmin.html Formuna Aktar
+        </button>
+        <p class="ipucu mt-3 mb-0">Sorular tarayıcı hafızasına kaydedilir ve yönetim paneli açılır. Havuz bu sayfada korunur.</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    const MAX = 30;
+    const HARFLER = ['A', 'B', 'C', 'D', 'E'];
+    const AKTARIM_ANAHTARI = 'soruAdminAktarim';
+    const HAVUZ_ANAHTARI = 'gorselOkuHavuz';
+
+    // <PARSER>
+    // ---------- Ayrıştırma ----------
+    const CEVAP_KELIME = '(?:doğru\\s+)?(?:cevap|cevab[ıiIİ]|yan[ıiIİ]t[ıiIİ]?)';
+
+    function normalize(t) {
+        return String(t).replace(/\r\n?/g, '\n')
+            .replace(/[\u00A0\u2007\u202F]/g, ' ')
+            .replace(/[\u200B-\u200D\u2060\uFEFF\u00AD]/g, '')
+            .split('\n').map(s => s.replace(/[ \t]+/g, ' ').trim()).join('\n')
+            .replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    // Metnin sonundaki "Cevap Anahtarı: 1-A 2-B ..." bölümünü ayırır
+    function anahtariAyir(metin) {
+        const re = /^(?:doğru\s+)?(?:cevaplar|cevap\s*anahtar[ıiIİ]|yan[ıiIİ]t\s*anahtar[ıiIİ]|yan[ıiIİ]tlar)[ ]*[:=\-–]?/gim;
+        let son = null, m;
+        while ((m = re.exec(metin))) son = m;
+        if (!son) return { govde: metin, anahtar: {} };
+
+        const kuyruk = metin.slice(son.index + son[0].length);
+        const pr = /(\d{1,3})\s*[-.):=]?\s*([A-Ea-e])(?![A-Za-zÇĞİÖŞÜçğıöşü])/g;
+        const anahtar = {};
+        let n = 0, p;
+        while ((p = pr.exec(kuyruk))) { anahtar[+p[1]] = p[2].toUpperCase(); n++; }
+        const artik = kuyruk.replace(pr, '').replace(/[\s,;.\-–:()]/g, '');
+        if (n < 1 || artik.length > n * 2 + 10) return { govde: metin, anahtar: {} };
+        return { govde: metin.slice(0, son.index).trim(), anahtar };
+    }
+
+    // Satır "1. ...", "1) ...", "1- ..." veya "Soru 1: ..." ile mi başlıyor?
+    function soruBasiMi(satir) {
+        let m = satir.match(/^soru\s*[-:.]?\s*(\d{1,3})\s*(?:[.)\-–—:]\s*)?(.*)$/i);
+        if (m) return { no: +m[1], kalan: m[2], guclu: true };
+        m = satir.match(/^(\d{1,3})\s*(?:[.)](?!\d)|[-–—:](?=\s))\s*(.*)$/);
+        if (m) return { no: +m[1], kalan: m[2], guclu: false };
+        return null;
+    }
+
+    function markerRe(harf, satirBasi) {
+        return satirBasi
+            ? new RegExp('(^|\\n)\\(?' + harf + '[ ]*(?:\\)|\\.|[-–—:](?=\\s))[ ]*', 'gi')
+            : new RegExp('(^|\\s)\\(?' + harf + '[ ]*(?:\\)|\\.(?=\\s))[ ]*', 'gi');
+    }
+
+    function ilkMarker(metin, harf, pos) {
+        for (const satirBasi of [true, false]) {
+            const re = markerRe(harf, satirBasi);
+            re.lastIndex = pos;
+            const m = re.exec(metin);
+            if (m) return { bas: m.index + m[1].length, son: m.index + m[0].length };
+        }
+        return null;
+    }
+
+    // Metni soru gövdesi + A..E şıklarına böler
+    function sikCikar(metin) {
+        const adaylar = [];
+        const goruldu = new Set();
+        [true, false].forEach(sb => {
+            const re = markerRe('A', sb);
+            let m;
+            while ((m = re.exec(metin))) {
+                const bas = m.index + m[1].length;
+                if (!goruldu.has(bas)) {
+                    goruldu.add(bas);
+                    adaylar.push({ bas, son: m.index + m[0].length });
+                }
+            }
+        });
+        adaylar.sort((x, y) => y.bas - x.bas); // şıklar sonda olur: sondaki "A)" adayından başla
+
+        for (const a of adaylar) {
+            const z = [{ harf: 'A', bas: a.bas, son: a.son }];
+            let pos = a.son;
+            for (let i = 1; i < 5; i++) {
+                const m = ilkMarker(metin, HARFLER[i], pos);
+                if (!m) break;
+                z.push({ harf: HARFLER[i], bas: m.bas, son: m.son });
+                pos = m.son;
+            }
+            if (z.length >= 2) {
+                const s = { soru: metin.slice(0, z[0].bas), a: '', b: '', c: '', d: '', e: '', sayi: z.length };
+                z.forEach((x, k) => {
+                    const bit = k + 1 < z.length ? z[k + 1].bas : metin.length;
+                    s[x.harf.toLowerCase()] = metin.slice(x.son, bit);
+                });
+                return s;
+            }
+        }
+        return { soru: metin, a: '', b: '', c: '', d: '', e: '', sayi: 0 };
+    }
+
+    // "Cevap: C" satırını (veya sondaki "Cevap: C" ifadesini) bulup metinden çıkarır
+    function cevapCikar(metin) {
+        let dogru = '';
+        const satirRe = new RegExp('(?:^|\\n)' + CEVAP_KELIME + '[ ]*[:=\\-–]?[ ]*\\(?([A-Ea-e])\\)?[ ]*\\.?(?=\\n|$)', 'gi');
+        let son = null, m;
+        while ((m = satirRe.exec(metin))) son = m;
+        if (son) {
+            dogru = son[1].toUpperCase();
+            metin = metin.replace(satirRe, '');
+        }
+        const kuyrukRe = new RegExp('[ \\n]' + CEVAP_KELIME + '[ ]*[:=][ ]*\\(?([A-Ea-e])\\)?[ ]*\\.?[ ]*$', 'i');
+        const k = metin.match(kuyrukRe);
+        if (k) {
+            if (!dogru) dogru = k[1].toUpperCase();
+            metin = metin.slice(0, k.index);
+        }
+        return { metin, dogru };
+    }
+
+    // Soru metnindeki PDF kaynaklı satır sonlarını birleştirir (liste maddelerine dokunmaz)
+    function satirBirlestir(s) {
+        const satirlar = s.split('\n').map(x => x.trim()).filter(Boolean);
+        let cikti = '';
+        satirlar.forEach((satir, i) => {
+            if (i === 0) { cikti = satir; return; }
+            const listeMi = /^(?:[IVXivx]{1,4}[.)]|\d{1,2}[.)]|[-•*▪●○■]|\([IVXivx\d]+\))\s/.test(satir + ' ');
+            cikti += (listeMi ? '\n' : ' ') + satir;
+        });
+        return cikti;
+    }
+
+    function soruTemizle(s, birlestir) {
+        let t = s.split('\n').map(x => x.trim()).join('\n').replace(/\n{2,}/g, '\n').trim();
+        return birlestir ? satirBirlestir(t) : t;
+    }
+
+    function blokCoz(blok, birlestir) {
+        const c = cevapCikar(blok.satirlar.join('\n'));
+        const s = sikCikar(c.metin.trim());
+        const t = x => x.replace(/\s*\n\s*/g, ' ').trim();
+        return {
+            kaynakNo: blok.no,
+            sayi: s.sayi,
+            soru: soruTemizle(s.soru, birlestir),
+            a: t(s.a), b: t(s.b), c: t(s.c), d: t(s.d), e: t(s.e),
+            dogru: c.dogru
+        };
+    }
+
+    function bloklaraBol(metin) {
+        const bloklar = [];
+        let aktif = null;
+        for (const satir of metin.split('\n')) {
+            const bas = soruBasiMi(satir);
+            if (bas) {
+                // Açık soru en az 2 şık aldıysa tamamdır; yeni numara yeni sorudur.
+                // Şık almamış bir sorunun gövdesindeki "1. Ali" gibi maddeler yeni soru sayılmaz.
+                const yeni = !aktif || bas.guclu || sikCikar(aktif.satirlar.join('\n')).sayi >= 2;
+                if (yeni) {
+                    aktif = { no: bas.no, satirlar: [bas.kalan] };
+                    bloklar.push(aktif);
+                    continue;
+                }
+            }
+            if (aktif) aktif.satirlar.push(satir);
+        }
+        return bloklar;
+    }
+
+    function metniAyristir(ham, birlestir) {
+        const { govde, anahtar } = anahtariAyir(normalize(ham));
+        let sonuc = bloklaraBol(govde).map(b => blokCoz(b, birlestir));
+
+        if (!sonuc.length) {
+            // Numara yok: boş satırla ayrılmış, şıklı bloklara bak
+            sonuc = govde.split(/\n\s*\n+/).map(p => p.trim()).filter(Boolean)
+                .map(p => blokCoz({ no: null, satirlar: [p] }, birlestir))
+                .filter(q => q.sayi >= 2);
+        }
+        sonuc.forEach(q => {
+            if (!q.dogru && q.kaynakNo != null && anahtar[q.kaynakNo]) q.dogru = anahtar[q.kaynakNo];
+        });
+        return sonuc.filter(q => q.soru || q.sayi > 0);
+    }
+    // </PARSER>
+
+    // ---------- Durum ----------
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const uid = () => 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const duzenlenen = new Set();
+
+    function yeniSoru(v) {
+        v = v || {};
+        return {
+            id: v.id || uid(),
+            soru: String(v.soru || ''),
+            a: String(v.a || ''), b: String(v.b || ''), c: String(v.c || ''), d: String(v.d || ''), e: String(v.e || ''),
+            dogru: /^[A-E]$/.test(v.dogru) ? v.dogru : ''
+        };
+    }
+
+    function havuzYukle() {
+        try {
+            const v = JSON.parse(localStorage.getItem(HAVUZ_ANAHTARI) || '[]');
+            return Array.isArray(v) ? v.slice(0, MAX).map(yeniSoru) : [];
+        } catch (e) { return []; }
+    }
+    function havuzKaydet() {
+        try { localStorage.setItem(HAVUZ_ANAHTARI, JSON.stringify(havuz)); } catch (e) { /* dolu/engelli: sessizce geç */ }
+    }
+
+    let havuz = havuzYukle();
+
+    function bildir(kutuId, html, tip) {
+        $(kutuId).innerHTML = html ? `<div class="alert alert-${tip || 'success'} mb-0" role="alert">${html}</div>` : '';
+    }
+
+    function uyarilar(q) {
+        const u = [];
+        if (!q.soru.trim()) u.push('Soru metni boş');
+        const bos = HARFLER.filter(h => !q[h.toLowerCase()].trim());
+        if (bos.length) u.push('Boş şık: ' + bos.join(', '));
+        if (!q.dogru) u.push('Doğru cevap seçilmedi');
+        return u;
+    }
+
+    // ---------- Çizim ----------
+    function kartHTML(q, i) {
+        const duz = duzenlenen.has(q.id);
+        const uy = uyarilar(q);
+
+        const dogruButonlari = HARFLER.map(h =>
+            `<button type="button" class="btn ${q.dogru === h ? 'btn-success' : 'btn-outline-secondary'}" data-islem="dogru" data-harf="${h}" aria-pressed="${q.dogru === h}">${h}</button>`
+        ).join('');
+
+        const govde = duz
+            ? `<textarea class="form-control mb-2" rows="3" data-alan="soru" placeholder="Soru metni" aria-label="Soru metni">${esc(q.soru)}</textarea>` +
+              HARFLER.map(h => `
+                <div class="input-group mb-2">
+                    <span class="input-group-text">${h}</span>
+                    <input type="text" class="form-control" data-alan="${h.toLowerCase()}" value="${esc(q[h.toLowerCase()])}" placeholder="${h} şıkkı" aria-label="${h} şıkkı">
+                </div>`).join('')
+            : `<div class="soru-metin">${q.soru.trim() ? esc(q.soru) : '<span class="text-muted fst-italic">(soru metni boş)</span>'}</div>` +
+              HARFLER.map(h => {
+                  const v = q[h.toLowerCase()];
+                  return v.trim()
+                      ? `<div class="sik-satir ${q.dogru === h ? 'dogru' : ''}"><b>${h})</b><span>${esc(v)}</span></div>`
+                      : `<div class="sik-satir bos"><b>${h})</b><span>(boş)</span></div>`;
+              }).join('');
+
+        return `
+        <div class="soru-karti ${uy.length ? 'uyarili' : ''}" data-id="${q.id}">
+            <div class="d-flex align-items-center gap-2">
+                <span class="sira-rozet">${i + 1}</span>
+                <div class="ms-auto d-flex gap-1">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-islem="yukari" ${i === 0 ? 'disabled' : ''} aria-label="Yukarı taşı"><i class="fas fa-arrow-up"></i></button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-islem="asagi" ${i === havuz.length - 1 ? 'disabled' : ''} aria-label="Aşağı taşı"><i class="fas fa-arrow-down"></i></button>
+                    <button type="button" class="btn ${duz ? 'btn-success' : 'btn-outline-primary'} btn-sm" data-islem="duzenle" aria-label="${duz ? 'Düzenlemeyi bitir' : 'Düzenle'}"><i class="fas ${duz ? 'fa-check' : 'fa-pen'}"></i>${duz ? ' Bitti' : ''}</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-islem="sil" aria-label="Sil"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            ${govde}
+            <div class="d-flex align-items-center flex-wrap gap-2 mt-2">
+                <small class="text-muted">Doğru cevap:</small>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Doğru cevap">${dogruButonlari}</div>
+            </div>
+            ${!duz && uy.length ? `<div class="mt-2 d-flex flex-wrap gap-1">${uy.map(x => `<span class="badge text-bg-warning rozet-uyari">${esc(x)}</span>`).join('')}</div>` : ''}
+        </div>`;
+    }
+
+    function havuzCiz() {
+        const n = havuz.length;
+        $('sayac').textContent = `${n} / ${MAX}`;
+        const pb = $('ilerleme');
+        pb.style.width = (n / MAX * 100) + '%';
+        pb.classList.toggle('dolu', n >= MAX);
+        $('bosDurum').classList.toggle('d-none', n > 0);
+        $('havuzListe').innerHTML = havuz.map(kartHTML).join('');
+        $('btnAktar').disabled = n === 0;
+        $('btnAyristir').disabled = n >= MAX;
+        $('btnBosSoru').disabled = n >= MAX;
+        $('btnHavuzTemizle').disabled = n === 0;
+    }
+
+    function kartaGit(id) {
+        const el = document.querySelector(`.soru-karti[data-id="${id}"]`);
+        if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    // ---------- Ayrıştır ve ekle ----------
+    function ayristirVeEkle() {
+        const ham = $('metin').value;
+        if (!ham.trim()) return bildir('bildirim', 'Önce soru metnini yapıştırın.', 'warning');
+
+        const kalan = MAX - havuz.length;
+        if (kalan <= 0) return bildir('bildirim', `Havuz dolu (${MAX}/${MAX}). Yeni soru eklemek için havuzdan soru silin.`, 'warning');
+
+        const bulunan = metniAyristir(ham, $('satirBirlestir').checked);
+        if (!bulunan.length) {
+            return bildir('bildirim',
+                'Soru bulunamadı. Her soru <code>1.</code> gibi bir numarayla başlamalı ve şıklar <code>A)</code>, <code>B)</code>... ile yazılmalı.',
+                'danger');
+        }
+
+        const eklenecek = bulunan.slice(0, kalan);
+        const tasan = bulunan.length - eklenecek.length;
+        eklenecek.forEach(q => havuz.push(yeniSoru(q)));
+        havuzKaydet();
+        havuzCiz();
+        $('metin').value = '';
+
+        const cevapli = eklenecek.filter(q => q.dogru).length;
+        const eksikSik = eklenecek.filter(q => q.sayi < 5).length;
+        let mesaj = `<strong>${eklenecek.length} soru</strong> ayrıştırıldı ve havuza eklendi (${havuz.length}/${MAX}).`;
+        if (cevapli) mesaj += `<br>Doğru cevabı metinden okunan soru: ${cevapli}`;
+        if (cevapli < eklenecek.length) mesaj += `<br>Doğru cevabı seçilmesi gereken soru: ${eklenecek.length - cevapli}`;
+        if (eksikSik) mesaj += `<br>5 şıktan azı bulunan soru: ${eksikSik} (havuzda kontrol edin)`;
+        if (tasan) mesaj += `<br><strong>${tasan} soru</strong> havuz dolduğu için eklenemedi.`;
+        bildir('bildirim', mesaj, tasan || eksikSik ? 'warning' : 'success');
+        $('aktarBildirim').innerHTML = '';
+    }
+
+    // ---------- Havuz işlemleri ----------
+    $('havuzListe').addEventListener('click', e => {
+        const btn = e.target.closest('[data-islem]');
+        if (!btn) return;
+        const kart = btn.closest('.soru-karti');
+        const id = kart.dataset.id;
+        const i = havuz.findIndex(q => q.id === id);
+        if (i < 0) return;
+
+        switch (btn.dataset.islem) {
+            case 'yukari':
+                if (i > 0) { [havuz[i - 1], havuz[i]] = [havuz[i], havuz[i - 1]]; }
+                break;
+            case 'asagi':
+                if (i < havuz.length - 1) { [havuz[i + 1], havuz[i]] = [havuz[i], havuz[i + 1]]; }
+                break;
+            case 'duzenle':
+                duzenlenen.has(id) ? duzenlenen.delete(id) : duzenlenen.add(id);
+                break;
+            case 'dogru':
+                havuz[i].dogru = havuz[i].dogru === btn.dataset.harf ? '' : btn.dataset.harf;
+                break;
+            case 'sil':
+                if (!confirm(`${i + 1}. soru havuzdan silinsin mi?`)) return;
+                havuz.splice(i, 1);
+                duzenlenen.delete(id);
+                havuzKaydet(); havuzCiz();
+                return;
+        }
+        havuzKaydet();
+        havuzCiz();
+        kartaGit(id);
+    });
+
+    // Düzenleme alanları: yazarken sadece durumu güncelle (odak kaybolmasın)
+    $('havuzListe').addEventListener('input', e => {
+        const alan = e.target.dataset.alan;
+        if (!alan) return;
+        const q = havuz.find(x => x.id === e.target.closest('.soru-karti').dataset.id);
+        if (!q) return;
+        q[alan] = e.target.value;
+        havuzKaydet();
+    });
+
+    $('btnBosSoru').addEventListener('click', () => {
+        if (havuz.length >= MAX) return;
+        const q = yeniSoru();
+        havuz.push(q);
+        duzenlenen.add(q.id);
+        havuzKaydet(); havuzCiz(); kartaGit(q.id);
+    });
+
+    $('btnHavuzTemizle').addEventListener('click', () => {
+        if (!havuz.length || !confirm(`Havuzdaki ${havuz.length} soru silinecek. Emin misiniz?`)) return;
+        havuz = [];
+        duzenlenen.clear();
+        havuzKaydet(); havuzCiz();
+        bildir('bildirim', 'Havuz boşaltıldı.', 'secondary');
+        $('aktarBildirim').innerHTML = '';
+    });
+
+    // ---------- Metin alanı ----------
+    $('btnAyristir').addEventListener('click', ayristirVeEkle);
+    $('btnMetinTemizle').addEventListener('click', () => { $('metin').value = ''; $('metin').focus(); });
+    $('btnOrnek').addEventListener('click', () => {
+        $('metin').value =
+`1. Aşağıdakilerden hangisi bir meyvedir?
+A) Havuç
+B) Elma
+C) Patates
+D) Soğan
+E) Ispanak
+
+2) Türkiye'nin başkenti neresidir?
+A. İstanbul B. Ankara C. İzmir D. Bursa E. Antalya
+
+3- 3 + 5 işleminin sonucu kaçtır?
+A) 6
+B) 7
+C) 8
+D) 9
+E) 10
+Cevap: C
+
+CEVAP ANAHTARI: 1-B 2-B`;
+        bildir('bildirim', 'Örnek metin yüklendi. "Metni Ayrıştır ve Havuza Ekle" düğmesine basın.', 'info');
+    });
+
+    // ---------- soruadmin.html'e aktar ----------
+    $('btnAktar').addEventListener('click', () => {
+        const gidecek = havuz.filter(q => q.soru.trim());
+        const bosSoru = havuz.length - gidecek.length;
+        if (!gidecek.length) return bildir('aktarBildirim', 'Aktarılacak soru yok: soru metinleri boş.', 'warning');
+
+        const cevapsiz = gidecek.filter(q => !q.dogru).length;
+        const eksikSik = gidecek.filter(q => HARFLER.some(h => !q[h.toLowerCase()].trim())).length;
+        const notlar = [];
+        if (bosSoru) notlar.push(`• ${bosSoru} sorunun metni boş, aktarılmayacak`);
+        if (cevapsiz) notlar.push(`• ${cevapsiz} soruda doğru cevap seçilmedi (soruadmin'de "A" kalır)`);
+        if (eksikSik) notlar.push(`• ${eksikSik} soruda boş şık var`);
+        if (notlar.length && !confirm('Dikkat:\n' + notlar.join('\n') + '\n\nYine de aktarılsın mı?')) return;
+
+        const paket = {
+            surum: 1,
+            tarih: new Date().toISOString(),
+            sorular: gidecek.slice(0, MAX).map(q => ({
+                soru: q.soru.trim(), a: q.a, b: q.b, c: q.c, d: q.d, e: q.e, dogru: q.dogru
+            }))
+        };
+        try {
+            localStorage.setItem(AKTARIM_ANAHTARI, JSON.stringify(paket));
+        } catch (e) {
+            return bildir('aktarBildirim', 'Tarayıcı hafızasına yazılamadı. Gizli sekmede olmayın ve site verisine izin verin.', 'danger');
+        }
+        window.location.href = 'soruadmin.html';
+    });
+
+    havuzCiz();
+})();
+</script>
+</body>
+</html>
