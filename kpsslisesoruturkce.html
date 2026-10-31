@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Bahçesi | Sınav Modu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            background: linear-gradient(145deg, #f0f4fc 0%, #e9eefa 100%);
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 12px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @media (min-width: 768px) { body { padding: 20px; } }
+        .main-container { max-width: 1100px; margin: 0 auto; width: 100%; }
+        .header { text-align: center; margin-bottom: 24px; padding: 0 8px; }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        @media (min-width: 768px) { .header h1 { font-size: 2.2rem; } }
+        .header p { color: #6c757d; font-size: 0.9rem; }
+        .accordion { width: 100%; }
+        .accordion-item {
+            margin-bottom: 20px;
+            border-radius: 0 !important;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        .accordion-button {
+            font-size: 1rem;
+            padding: 14px 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 0 !important;
+            flex-wrap: wrap;
+            row-gap: 6px;
+            text-align: left;
+        }
+        @media (min-width: 768px) { .accordion-button { padding: 18px 24px; } }
+        .accordion-button:not(.collapsed) { background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%); color: white; }
+        .accordion-button:focus { box-shadow: none; }
+        .accordion-button::after { filter: brightness(0) invert(1); margin-left: auto; }
+        .accordion-body { background: #f8fafd; padding: 12px; width: 100%; }
+        @media (min-width: 768px) { .accordion-body { padding: 20px; } }
+
+        .konu-arama-kapsayici {
+            padding: 12px;
+            background: #e9eefa;
+            margin-bottom: 16px;
+            border-radius: 12px;
+        }
+        @media (min-width: 768px) { .konu-arama-kapsayici { padding: 15px 20px; margin-bottom: 20px; } }
+        .konu-arama-kapsayici .form-control { font-size: 16px; min-height: 44px; }
+
+        .test-accordion-item {
+            margin-bottom: 16px;
+            border-radius: 0 !important;
+            overflow: hidden;
+            border: 1px solid #eef2f9;
+            background: white;
+            width: 100%;
+        }
+        .test-accordion-button {
+            font-size: 0.9rem;
+            padding: 12px 14px;
+            font-weight: 600;
+            background: #ffffff;
+            color: #1e2b5c;
+            border: none;
+            width: 100%;
+            border-radius: 0 !important;
+        }
+        @media (min-width: 768px) { .test-accordion-button { padding: 14px 20px; } }
+        .test-accordion-button:not(.collapsed) { background: #e9eefa; color: #1e2b5c; }
+        .test-accordion-button:focus { box-shadow: none; }
+        .test-accordion-button::after { filter: none; }
+        .test-accordion-body { background: white; padding: 0 !important; width: 100%; }
+
+        .soru-karti {
+            background: #f8fafd;
+            padding: 14px;
+            border-bottom: 1px solid #eef2f9;
+            width: 100%;
+            display: block;
+        }
+        @media (min-width: 768px) { .soru-karti { padding: 20px; } }
+        .soru-numarasi {
+            display: inline-block;
+            background: #1e2b5c;
+            color: white;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .soru-metni {
+            font-weight: 600;
+            color: #1e2b5c;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            line-height: 1.5;
+            padding: 12px;
+            background: white;
+            border: 1px solid #eef2f9;
+            width: 100%;
+            overflow-wrap: anywhere;
+        }
+        .cevap-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            min-height: 48px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #eef2f9;
+            cursor: pointer;
+            width: 100%;
+        }
+        .cevap-option:hover { background: #f0f4fc; border-color: #1e2b5c; }
+        .cevap-option input { margin-right: 14px; width: 20px; height: 20px; flex-shrink: 0; cursor: pointer; accent-color: #1e2b5c; }
+        .cevap-option label { margin: 0; cursor: pointer; font-size: 0.9rem; color: #2c3e5c; flex: 1; overflow-wrap: anywhere; padding: 6px 0; }
+        .sinav-bitir-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #198754 0%, #157347 100%);
+            border: none;
+            color: white;
+            transition: all 0.2s;
+        }
+        .test-badge, .konu-badge {
+            background: rgba(0,0,0,0.1);
+            border-radius: 30px;
+            padding: 3px 10px;
+            font-size: 0.7rem;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+        .modal-sonuc .modal-content { border-radius: 28px; border: none; overflow: hidden; }
+        .modal-header { background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%); color: white; padding: 20px 24px; }
+        .modal-header .btn-close { filter: brightness(0) invert(1); }
+        .modal-body { padding: 24px 16px; }
+        @media (min-width: 576px) { .modal-body { padding: 30px 24px; } }
+        .sonuc-detay { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 20px; }
+        @media (min-width: 576px) { .sonuc-detay { gap: 20px; } }
+        .sonuc-item { min-width: 100px; flex: 1 1 40%; padding: 16px 12px; border-radius: 20px; text-align: center; }
+        @media (min-width: 576px) { .sonuc-item { flex: 1 1 0; padding: 20px 16px; } }
+        .sonuc-item.dogru { background: #d4edda; color: #155724; }
+        .sonuc-item.yanlis { background: #f8d7da; color: #721c24; }
+        .sonuc-item.bos { background: #fff3cd; color: #856404; }
+        .sonuc-item.basari { background: linear-gradient(135deg, #1e2b5c 0%, #2d3a6e 100%); color: white; }
+        .sonuc-item .sayi { display: block; font-size: 2rem; font-weight: 800; }
+        .btn-tekrar-dene { background: #1e2b5c; color: white; border: none; padding: 12px 32px; border-radius: 40px; font-weight: 600; }
+        .bos-mesaj { text-align: center; padding: 60px 20px; background: white; border-radius: 24px; }
+        .bos-mesaj i { font-size: 3rem; color: #cbd5e1; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="header">
+        <h1><i class="fas fa-graduation-cap"></i> Öğrenci Bahçesi Sınav Modu</h1>
+        <p>📅 KPSS Lise Soru Bankası</p>
+    </div>
+
+    <div id="sinavIcerik">
+        <div class="bos-mesaj">
+            <div class="spinner-border" style="color:#1e2b5c" role="status"></div>
+            <p class="mt-3 mb-0">Sorular yükleniyor...</p>
+        </div>
+    </div>
+</div>
+
+<!-- SONUÇ MODAL -->
+<div class="modal fade" id="sonucModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-sonuc">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-chart-simple me-2"></i>Sınav Sonucu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer justify-content-center pb-4">
+                <button type="button" class="btn-tekrar-dene" data-bs-dismiss="modal"><i class="fas fa-redo-alt"></i> Tamam</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAKby0Kn3GAgWiT35W4HjJmK6GpDQBaK0E",
+        authDomain: "kpiseturkcesorubankasi.firebaseapp.com",
+        projectId: "kpiseturkcesorubankasi",
+        storageBucket: "kpiseturkcesorubankasi.firebasestorage.app",
+        messagingSenderId: "680736969646",
+        appId: "1:680736969646:web:00e6287dba17b9738f2e3f",
+        measurementId: "G-F0SP6BKGMX",
+        // Konsolda Realtime Database > Data sekmesinde görünen adresle aynı olmalı
+        databaseURL: "https://kpiseturkcesorubankasi-default-rtdb.firebaseio.com"
+    };
+    const app = initializeApp(firebaseConfig);
+
+    /* ====================================================================
+       APP CHECK (reCAPTCHA v3) - İSTEĞE BAĞLI, ŞİMDİLİK KAPALI
+       Etkinleştirmek için:
+         1) Firebase Konsolu > Build > App Check > Apps > Web uygulamanı kaydet,
+            sağlayıcı olarak "reCAPTCHA v3" seç, verilen SITE KEY'i aşağıya yaz.
+         2) Aşağıdaki iki satırın yorumunu kaldır (initializeApp'ten SONRA,
+            getDatabase'den ÖNCE kalmalı).
+         3) Siteyi yayınla, birkaç gün App Check > APIs > Realtime Database
+            ekranında "doğrulanmış istek" oranını izle.
+         4) Oran ~%100 olunca aynı ekrandan "Enforce" (Zorunlu kıl) de.
+         Yerel geliştirmede (localhost): tarayıcı konsolunda
+         self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; yazıp çıkan jetonu
+         Konsol > App Check > Apps > Debug tokens bölümüne ekle.
+       ==================================================================== */
+    // import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app-check.js";
+    // initializeAppCheck(app, { provider: new ReCaptchaV3Provider('BURAYA_SITE_KEY'), isTokenAutoRefreshEnabled: true });
+
+    const db = getDatabase(app);
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const $ = id => document.getElementById(id);
+    const zaman = x => x.olusturma || 0;
+
+    // ---------- localStorage (kota/erişim hatalarına karşı korumalı) ----------
+    const LS = 'sb2_';
+    function lsOku(anahtar) {
+        try {
+            const ham = localStorage.getItem(LS + anahtar);
+            return ham ? JSON.parse(ham) : null;
+        } catch (err) { return null; }
+    }
+    function lsYaz(anahtar, deger) {
+        let metin;
+        try { metin = JSON.stringify(deger); } catch (err) { return false; }
+        try {
+            localStorage.setItem(LS + anahtar, metin);
+            return true;
+        } catch (err) {
+            // Kota doluysa soru önbelleklerini temizleyip bir kez daha dene
+            try {
+                Object.keys(localStorage)
+                    .filter(a => a.startsWith(LS + 't_'))
+                    .forEach(a => localStorage.removeItem(a));
+                localStorage.setItem(LS + anahtar, metin);
+                return true;
+            } catch (err2) { return false; }
+        }
+    }
+
+    // ---------- Bellekteki durum ----------
+    let surum = 0;                       // meta/guncelleme değeri
+    let konular = [], testler = [];
+    let testlerByKonu = new Map();       // konuId -> [test]
+    let testById = new Map();            // testId -> test
+    const sorularByTest = new Map();     // testId -> [soru] (sira'ya göre)
+    const aramaIndeks = new Map();       // testId -> [{id, metin}]
+    const yukleniyor = new Map();        // testId -> Promise (aynı anda tekrar indirmeyi önler)
+    const kartEl = new Map();            // soruId -> DOM elemanı
+    const aramaDurumu = new Map();       // konuId -> son arama metni
+    const aramaZamanlayici = new Map();  // konuId -> debounce zamanlayıcısı
+
+    const SPINNER_BUYUK = `
+        <div class="bos-mesaj">
+            <div class="spinner-border" style="color:#1e2b5c" role="status"></div>
+            <p class="mt-3 mb-0">Sorular yükleniyor...</p>
+        </div>`;
+    const SPINNER_KUCUK = `
+        <div class="text-center p-4 text-muted">
+            <div class="spinner-border spinner-border-sm me-2" style="color:#1e2b5c" role="status"></div>
+            <span>Sorular yükleniyor...</span>
+        </div>`;
+
+    function hataMetni(err) {
+        const kod = String((err && (err.code || err.message)) || '');
+        if (/permission/i.test(kod)) return 'Verilere erişim izni verilmedi. Lütfen daha sonra tekrar deneyin.';
+        if (/network|offline|unavailable|baglanti|timeout/i.test(kod)) return 'İnternet bağlantısı kurulamadı. Bağlantınızı kontrol edip tekrar deneyin.';
+        return 'Beklenmeyen bir sorun oluştu. Lütfen tekrar deneyin.';
+    }
+
+    // ---------- Konular ve testler (önbellekli) ----------
+    const liste = snap => Object.entries(snap.val() || {}).map(([id, v]) => ({ id, ...v }));
+
+    async function katalogYukle() {
+        let uzak = 0, cevrimdisi = false;
+        try {
+            const s = await get(ref(db, 'meta/guncelleme'));      // birkaç baytlık küçük okuma
+            uzak = Number(s.val()) || 0;
+        } catch (err) {
+            cevrimdisi = true;
+            console.error(err);
+        }
+
+        const onbellek = lsOku('katalog');
+        const onbellekGecerli = onbellek && Array.isArray(onbellek.konular) && Array.isArray(onbellek.testler);
+        if (onbellekGecerli && (cevrimdisi || (uzak > 0 && onbellek.v === uzak))) {
+            surum = onbellek.v || 0;
+            konular = onbellek.konular;
+            testler = onbellek.testler;
+            return { cevrimdisi };
+        }
+        if (cevrimdisi) throw new Error('baglanti');
+
+        const [k, t] = await Promise.all([get(ref(db, 'konular')), get(ref(db, 'testler'))]);
+        konular = liste(k).sort((a, b) => zaman(a) - zaman(b));
+        testler = liste(t).sort((a, b) => zaman(a) - zaman(b));
+        surum = uzak;
+        lsYaz('katalog', { v: surum, konular, testler });
+        return { cevrimdisi: false };
+    }
+
+    // Map ile gruplama (iç içe filter/some yok)
+    function indeksle() {
+        testlerByKonu = new Map();
+        testById = new Map();
+        testler.forEach(t => {
+            testById.set(t.id, t);
+            if (!testlerByKonu.has(t.konu_id)) testlerByKonu.set(t.konu_id, []);
+            testlerByKonu.get(t.konu_id).push(t);
+        });
+    }
+    // soru_sayisi kaydı yoksa (taşıma öncesi) test gösterilir; 0 ise gizlenir
+    const gorunur = t => !Number.isFinite(t.soru_sayisi) || t.soru_sayisi > 0;
+    const testSurumu = t => t.guncelleme || surum;
+
+    // ---------- Bir testin soruları (lazy load + önbellek) ----------
+    function aramaIndeksiKur(testId, sorular) {
+        aramaIndeks.set(testId, sorular.map(s => ({
+            id: s.id,
+            metin: [s.soru_metni, s.cevap_a, s.cevap_b, s.cevap_c, s.cevap_d, s.cevap_e].join(' ').toLowerCase()
+        })));
+    }
+
+    function testSorulariniAl(test) {
+        const id = test.id;
+        if (sorularByTest.has(id)) return Promise.resolve(sorularByTest.get(id));
+        if (yukleniyor.has(id)) return yukleniyor.get(id);
+
+        const p = (async () => {
+            const v = testSurumu(test);
+            const onb = lsOku('t_' + id);
+            let sorular;
+            if (onb && v > 0 && onb.v === v && Array.isArray(onb.sorular)) {
+                sorular = onb.sorular;
+            } else {
+                const snap = await get(ref(db, 'sorular/' + id));
+                sorular = liste(snap).sort((a, b) => ((a.sira || 0) - (b.sira || 0)) || (zaman(a) - zaman(b)));
+                lsYaz('t_' + id, { v, sorular });
+            }
+            sorularByTest.set(id, sorular);
+            aramaIndeksiKur(id, sorular);
+            return sorular;
+        })();
+
+        yukleniyor.set(id, p);
+        const temizle = () => yukleniyor.delete(id);
+        p.then(temizle, temizle);
+        return p;
+    }
+
+    // ---------- Çizim ----------
+    function bosMesaj(ikon, baslik, altYazi = '') {
+        return `
+            <div class="bos-mesaj">
+                <i class="fas ${ikon}"></i>
+                <p>${baslik}</p>
+                ${altYazi ? `<small class="text-muted">${altYazi}</small>` : ''}
+            </div>`;
+    }
+
+    function katalogCiz(bilgiHtml = '') {
+        const container = $('sinavIcerik');
+
+        const gecerli = [];
+        konular.forEach(k => {
+            const tl = (testlerByKonu.get(k.id) || []).filter(gorunur);
+            if (tl.length) gecerli.push({ konu: k, testler: tl });
+        });
+
+        if (gecerli.length === 0) {
+            container.innerHTML = bilgiHtml + bosMesaj('fa-inbox', 'Henüz hiç soru eklenmemiş.',
+                'Önce kpsslisesoruadminturkce.html panelinden konu, test ve soru ekleyin.');
+            return;
+        }
+
+        let html = bilgiHtml + '<div class="accordion" id="konuAccordion">';
+        gecerli.forEach(({ konu, testler: konuTestleri }, idx) => {
+            const kid = esc(konu.id);
+            html += `
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button ${idx !== 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKonu${kid}">
+                        <i class="fas fa-book me-2"></i> ${esc(konu.konu_adi)}
+                        <span class="konu-badge">${konuTestleri.length} test</span>
+                    </button>
+                </h2>
+                <div id="collapseKonu${kid}" class="accordion-collapse collapse ${idx === 0 ? 'show' : ''}" data-bs-parent="#konuAccordion">
+                    <div class="accordion-body">
+                        <div class="konu-arama-kapsayici">
+                            <input type="text" class="form-control konu-arama" data-konu-id="${kid}" placeholder="🔍 Bu konu altındaki sorular içinde ara...">
+                            <div class="mt-2" id="aramaBilgi_${kid}"></div>
+                        </div>
+                        <div class="accordion" id="testAccordion_${kid}">`;
+
+            konuTestleri.forEach(test => {
+                const tid = esc(test.id);
+                const sayiMetni = Number.isFinite(test.soru_sayisi) ? `${test.soru_sayisi} soru` : 'soru';
+                html += `
+                <div class="test-accordion-item" id="testItem_${tid}">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button test-accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTest${tid}">
+                            <i class="fas fa-file-alt me-2"></i> ${esc(test.test_adi)}
+                            <span class="test-badge">${sayiMetni}</span>
+                        </button>
+                    </h2>
+                    <div id="collapseTest${tid}" class="accordion-collapse collapse test-collapse" data-test-id="${tid}" data-bs-parent="#testAccordion_${kid}">
+                        <div class="test-accordion-body">
+                            <form class="test-formu" data-test-id="${tid}" data-test-adi="${esc(test.test_adi)}">
+                                <div class="sorular-alani" id="sorularAlani_${tid}">
+                                    <div class="p-3 text-muted small">Soruları görmek için testi açın.</div>
+                                </div>
+                                <button type="submit" class="sinav-bitir-btn" style="display:none">
+                                    <i class="fas fa-flag-checkered"></i> Bu Testi Bitir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            html += `</div></div></div></div>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    function kartHtml(soru, sIdx) {
+        const sid = esc(soru.id);
+        return `
+        <div class="soru-karti" data-sid="${sid}">
+            <div class="soru-numarasi">Soru ${sIdx + 1}</div>
+            <div class="soru-metni">${esc(soru.soru_metni).replace(/\n/g, '<br>')}</div>
+            ${['a', 'b', 'c', 'd', 'e'].map(h => `
+            <div class="cevap-option"><input type="radio" name="cevap_${sid}" value="${h.toUpperCase()}" id="s_${sid}_${h}"><label for="s_${sid}_${h}"><strong>${h.toUpperCase()})</strong> ${esc(soru['cevap_' + h])}</label></div>`).join('')}
+        </div>`;
+    }
+
+    function sorulariCiz(test) {
+        const sorular = sorularByTest.get(test.id) || [];
+        const alan = $('sorularAlani_' + test.id);
+        if (!alan) return;
+        const form = alan.closest('form');
+        const btn = form ? form.querySelector('.sinav-bitir-btn') : null;
+
+        if (!sorular.length) {
+            alan.innerHTML = '<div class="p-3 text-muted">Bu testte soru bulunamadı.</div>';
+            if (btn) btn.style.display = 'none';
+            return;
+        }
+        alan.innerHTML = sorular.map((s, i) => kartHtml(s, i)).join('');
+        alan.querySelectorAll('.soru-karti').forEach(el => kartEl.set(el.dataset.sid, el));
+        if (btn) btn.style.display = '';
+    }
+
+    function testHatasiCiz(testId, err) {
+        const alan = $('sorularAlani_' + testId);
+        if (!alan) return;
+        alan.innerHTML = `
+            <div class="text-center p-4">
+                <p class="mb-2 text-danger"><i class="fas fa-triangle-exclamation me-1"></i> Sorular yüklenemedi.</p>
+                <p class="small text-muted mb-3">${esc(hataMetni(err))}</p>
+                <button type="button" class="btn-tekrar-dene" data-tekrar="test" data-test-id="${esc(testId)}"><i class="fas fa-redo-alt"></i> Tekrar dene</button>
+            </div>`;
+    }
+
+    // Test akordeonu ilk kez açılınca soruları yükle
+    async function testiAc(testId) {
+        const test = testById.get(testId);
+        if (!test) return;
+        const alan = $('sorularAlani_' + testId);
+        if (!alan) return;
+
+        if (sorularByTest.has(testId)) {
+            if (!alan.querySelector('.soru-karti') && (sorularByTest.get(testId) || []).length) sorulariCiz(test);
+            return;
+        }
+        alan.innerHTML = SPINNER_KUCUK;
+        try {
+            await testSorulariniAl(test);
+            sorulariCiz(test);
+            const q = aramaDurumu.get(test.konu_id);
+            if (q) aramaYap(test.konu_id, q);
+        } catch (err) {
+            console.error(err);
+            testHatasiCiz(testId, err);
+        }
+    }
+
+    // ---------- Arama (bellekteki diziden, debounce'lu) ----------
+    function aramaYap(konuId, ham) {
+        const q = String(ham || '').toLowerCase().trim();
+        aramaDurumu.set(konuId, q);
+        const konuTestleri = (testlerByKonu.get(konuId) || []).filter(gorunur);
+        let acilmamis = 0;
+
+        konuTestleri.forEach(t => {
+            const item = $('testItem_' + t.id);
+            if (!item) return;
+            const idx = aramaIndeks.get(t.id);
+
+            if (!q) {
+                item.style.display = '';
+                if (idx) idx.forEach(x => { const el = kartEl.get(x.id); if (el) el.style.display = ''; });
+                return;
+            }
+            if (!idx) {            // henüz yüklenmemiş test: aramaya dahil değil
+                acilmamis++;
+                item.style.display = 'none';
+                return;
+            }
+            let eslesme = false;
+            idx.forEach(x => {
+                const var_ = x.metin.includes(q);
+                const el = kartEl.get(x.id);
+                if (el) el.style.display = var_ ? 'block' : 'none';
+                if (var_) eslesme = true;
+            });
+            item.style.display = eslesme ? '' : 'none';
+        });
+
+        const bilgi = $('aramaBilgi_' + konuId);
+        if (bilgi) {
+            bilgi.innerHTML = (q && acilmamis)
+                ? `<small class="text-muted d-block mb-2">Arama yalnızca daha önce açılmış testlerde yapıldı.</small>
+                   <button type="button" class="btn btn-sm btn-outline-primary" data-aramayukle="${esc(konuId)}">Diğer ${acilmamis} testi de yükle ve ara</button>`
+                : '';
+        }
+    }
+
+    async function konuTestleriniYukle(konuId, btn) {
+        const bekleyen = (testlerByKonu.get(konuId) || []).filter(t => gorunur(t) && !sorularByTest.has(t.id));
+        btn.disabled = true;
+        btn.textContent = 'Yükleniyor...';
+        try {
+            // en fazla 4 istek aynı anda
+            for (let i = 0; i < bekleyen.length; i += 4) {
+                await Promise.all(bekleyen.slice(i, i + 4).map(t => testSorulariniAl(t)));
+            }
+            bekleyen.forEach(t => sorulariCiz(t));
+            aramaYap(konuId, aramaDurumu.get(konuId) || '');
+        } catch (err) {
+            console.error(err);
+            btn.disabled = false;
+            btn.textContent = 'Yüklenemedi, tekrar dene';
+        }
+    }
+
+    // ---------- Test bitirme ----------
+    function testiBitir(e, testId, testAdi) {
+        e.preventDefault();
+        const testSorulari = sorularByTest.get(testId) || [];
+        const toplamSoru = testSorulari.length;
+        let dogru = 0, yanlis = 0, bos = 0;
+
+        const formData = new FormData(e.target);
+        testSorulari.forEach(soru => {
+            const kullaniciCevap = formData.get(`cevap_${soru.id}`);
+            if (!kullaniciCevap) bos++;
+            else if (kullaniciCevap === soru.dogru_cevap) dogru++;
+            else yanlis++;
+        });
+
+        const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100 * 10) / 10 : 0;
+        const renk = yuzde >= 70 ? '#198754' : (yuzde >= 50 ? '#fd7e14' : '#dc3545');
+        const icon = yuzde >= 70 ? 'fa-trophy' : (yuzde >= 50 ? 'fa-thumbs-up' : 'fa-book-open');
+
+        $('modalBody').innerHTML = `
+            <h4 class="text-center mb-4"><i class="fas ${icon}" style="color: ${renk};"></i> ${esc(testAdi)}</h4>
+            <div class="sonuc-detay">
+                <div class="sonuc-item dogru"><i class="fas fa-check-circle fa-2x"></i><span class="sayi">${dogru}</span><span class="label">Doğru</span></div>
+                <div class="sonuc-item yanlis"><i class="fas fa-times-circle fa-2x"></i><span class="sayi">${yanlis}</span><span class="label">Yanlış</span></div>
+                <div class="sonuc-item bos"><i class="fas fa-minus-circle fa-2x"></i><span class="sayi">${bos}</span><span class="label">Boş</span></div>
+                <div class="sonuc-item basari"><i class="fas fa-percent fa-2x"></i><span class="sayi">${yuzde}%</span><span class="label">Başarı</span></div>
+            </div>
+            <div class="text-center mt-3"><small class="text-muted">Toplam ${toplamSoru} soru üzerinden değerlendirilmiştir.</small></div>
+        `;
+        new bootstrap.Modal($('sonucModal')).show();
+    }
+
+    // ---------- Olaylar (tek seferlik, delegasyonla) ----------
+    const container = $('sinavIcerik');
+
+    container.addEventListener('show.bs.collapse', e => {
+        const el = e.target;
+        if (el.classList && el.classList.contains('test-collapse')) testiAc(el.dataset.testId);
+    });
+
+    container.addEventListener('submit', e => {
+        const form = e.target;
+        if (form.classList && form.classList.contains('test-formu')) {
+            testiBitir(e, form.dataset.testId, form.dataset.testAdi);
+        }
+    });
+
+    container.addEventListener('input', e => {
+        const inp = e.target.closest ? e.target.closest('.konu-arama') : null;
+        if (!inp) return;
+        const konuId = inp.dataset.konuId;
+        clearTimeout(aramaZamanlayici.get(konuId));
+        aramaZamanlayici.set(konuId, setTimeout(() => aramaYap(konuId, inp.value), 250));
+    });
+
+    container.addEventListener('click', e => {
+        const tekrar = e.target.closest('[data-tekrar]');
+        if (tekrar) {
+            if (tekrar.dataset.tekrar === 'katalog') baslat();
+            else if (tekrar.dataset.tekrar === 'test') testiAc(tekrar.dataset.testId);
+            return;
+        }
+        const yukle = e.target.closest('[data-aramayukle]');
+        if (yukle) konuTestleriniYukle(yukle.dataset.aramayukle, yukle);
+    });
+
+    // ---------- Başlangıç ----------
+    async function baslat() {
+        container.innerHTML = SPINNER_BUYUK;
+        try {
+            const sonuc = await katalogYukle();
+            indeksle();
+            const bilgi = sonuc.cevrimdisi
+                ? '<div class="alert alert-warning py-2 small">Bağlantı kurulamadı; kayıtlı (önbellekteki) veriler gösteriliyor.</div>'
+                : '';
+            katalogCiz(bilgi);
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = `
+                <div class="bos-mesaj">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <p>Sorular yüklenemedi.</p>
+                    <p class="small text-muted">${esc(hataMetni(err))}</p>
+                    <button type="button" class="btn-tekrar-dene" data-tekrar="katalog"><i class="fas fa-redo-alt"></i> Tekrar dene</button>
+                </div>`;
+        }
+    }
+    baslat();
+</script>
+</body>
+</html>
