@@ -171,6 +171,45 @@
         .btn-tekrar-dene { background: #1e2b5c; color: white; border: none; padding: 12px 32px; border-radius: 40px; font-weight: 600; }
         .bos-mesaj { text-align: center; padding: 60px 20px; background: white; border-radius: 24px; }
         .bos-mesaj i { font-size: 3rem; color: #cbd5e1; margin-bottom: 16px; }
+
+        /* Sonuç ekranı */
+        @media (max-width: 575.98px) { .modal-sonuc .modal-content { border-radius: 0; } }
+        .modal-sonuc .modal-body { background: #f8fafd; }
+        .sonuc-ust { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
+        .halka { width: 132px; height: 132px; flex: 0 0 132px; border-radius: 50%; display: grid; place-items: center; }
+        .halka-ic { width: 98px; height: 98px; border-radius: 50%; background: #f8fafd; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+        .halka-ic b { font-size: 1.6rem; color: #1e2b5c; }
+        .halka-ic small { font-size: .7rem; color: #6c757d; }
+        .sonuc-kutular { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; flex: 1 1 260px; max-width: 420px; }
+        .sonuc-kutu { padding: 10px 12px; border-radius: 16px; text-align: center; background: #fff; border: 1px solid #eef2f9; }
+        .sonuc-kutu .sayi { display: block; font-size: 1.6rem; font-weight: 800; line-height: 1.2; }
+        .sonuc-kutu .etiket { font-size: .8rem; }
+        .sonuc-kutu.k-dogru { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .sonuc-kutu.k-yanlis { background: #f8d7da; color: #721c24; border-color: #f1b0b7; }
+        .sonuc-kutu.k-bos { background: #fff3cd; color: #856404; border-color: #ffe69c; }
+        .sonuc-mesaj { text-align: center; color: #6c757d; font-size: .9rem; margin-bottom: 16px; }
+        .sonuc-filtre { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 14px; }
+        .sonuc-filtre button { border: 1px solid #dbe2f0; background: #fff; color: #1e2b5c; border-radius: 30px; padding: 6px 14px; font-size: .85rem; font-weight: 600; min-height: 38px; }
+        .sonuc-filtre button.aktif { background: #1e2b5c; color: #fff; border-color: #1e2b5c; }
+        .sonuc-filtre button:disabled { opacity: .45; }
+        .sonuc-soru { background: #fff; border: 1px solid #e6ebf5; border-left: 5px solid #cbd5e1; border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+        .sonuc-soru.d-dogru { border-left-color: #198754; }
+        .sonuc-soru.d-yanlis { border-left-color: #dc3545; }
+        .sonuc-soru.d-bos { border-left-color: #f2c200; }
+        .sonuc-soru-ust { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+        .sonuc-soru-ust .soru-numarasi { margin-bottom: 0; }
+        .durum-rozet { font-size: .8rem; font-weight: 700; padding: 4px 12px; border-radius: 30px; }
+        .durum-rozet.r-dogru { background: #d4edda; color: #155724; }
+        .durum-rozet.r-yanlis { background: #f8d7da; color: #721c24; }
+        .durum-rozet.r-bos { background: #fff3cd; color: #856404; }
+        .sonuc-soru-metni { font-weight: 600; color: #1e2b5c; line-height: 1.5; margin-bottom: 10px; overflow-wrap: anywhere; }
+        .sonuc-sik { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 8px 12px; margin-bottom: 6px; border: 1px solid #eef2f9; border-radius: 10px; background: #fff; font-size: .9rem; color: #2c3e5c; overflow-wrap: anywhere; }
+        .sonuc-sik .sik-metin { flex: 1 1 140px; min-width: 0; }
+        .sonuc-sik.sk-dogru { background: #d4edda; border-color: #b7e1c1; color: #155724; }
+        .sonuc-sik.sk-yanlis { background: #f8d7da; border-color: #f1b0b7; color: #721c24; }
+        .sik-etiket { font-size: .72rem; font-weight: 700; white-space: nowrap; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,.7); }
+        .cevap-ozet { margin-top: 8px; font-size: .85rem; color: #6c757d; }
+        .cevap-ozet b { color: #1e2b5c; }
     </style>
 </head>
 <body>
@@ -190,7 +229,7 @@
 
 <!-- SONUÇ MODAL -->
 <div class="modal fade" id="sonucModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg modal-fullscreen-sm-down">
         <div class="modal-content modal-sonuc">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-chart-simple me-2"></i>Sınav Sonucu</h5>
@@ -402,7 +441,7 @@
 
         if (gecerli.length === 0) {
             container.innerHTML = bilgiHtml + bosMesaj('fa-inbox', 'Henüz hiç soru eklenmemiş.',
-                'Önce kpsslisesoruadminturkce.html panelinden konu, test ve soru ekleyin.');
+                'Önce kpsslisesoruturkceadmin.html panelinden konu, test ve soru ekleyin.');
             return;
         }
 
@@ -579,36 +618,106 @@
     }
 
     // ---------- Test bitirme ----------
+    const HARFLER = ['A', 'B', 'C', 'D', 'E'];
+    const DURUM = {
+        dogru:  { ad: 'Doğru',  ikon: 'fa-check-circle' },
+        yanlis: { ad: 'Yanlış', ikon: 'fa-times-circle' },
+        bos:    { ad: 'Boş',    ikon: 'fa-minus-circle' }
+    };
+
+    function sonucSoruHtml(d) {
+        const { soru, i, verilen, durum } = d;
+        const dogruHarf = soru.dogru_cevap;
+        const siklar = HARFLER.map(h => {
+            const metin = String(soru['cevap_' + h.toLowerCase()] ?? '');
+            if (!metin.trim() && h !== dogruHarf && h !== verilen) return '';
+            const sinif = h === dogruHarf ? 'sk-dogru' : (h === verilen ? 'sk-yanlis' : '');
+            let etiket = '';
+            if (h === dogruHarf) etiket = h === verilen ? 'Senin cevabın · Doğru' : 'Doğru cevap';
+            else if (h === verilen) etiket = 'Senin cevabın';
+            return `<div class="sonuc-sik ${sinif}"><strong>${h})</strong><span class="sik-metin">${esc(metin)}</span>${etiket ? `<span class="sik-etiket">${etiket}</span>` : ''}</div>`;
+        }).join('');
+        const ozet = durum === 'bos'
+            ? `Bu soruyu boş bıraktın · Doğru cevap: <b>${esc(dogruHarf)}</b>`
+            : `Senin cevabın: <b>${esc(verilen)}</b> · Doğru cevap: <b>${esc(dogruHarf)}</b>`;
+        return `
+        <div class="sonuc-soru d-${durum}" data-durum="${durum}">
+            <div class="sonuc-soru-ust">
+                <span class="soru-numarasi">Soru ${i + 1}</span>
+                <span class="durum-rozet r-${durum}"><i class="fas ${DURUM[durum].ikon}"></i> ${DURUM[durum].ad}</span>
+            </div>
+            <div class="sonuc-soru-metni">${esc(soru.soru_metni).replace(/\n/g, '<br>')}</div>
+            ${siklar}
+            <div class="cevap-ozet">${ozet}</div>
+        </div>`;
+    }
+
+    function sonucHtml(testAdi, detay) {
+        const toplam = detay.length;
+        const say = d => detay.filter(x => x.durum === d).length;
+        const dogru = say('dogru'), yanlis = say('yanlis'), bos = say('bos');
+        const cozulen = dogru + yanlis;
+        const yuzde = toplam > 0 ? Math.round((dogru / toplam) * 100 * 10) / 10 : 0;
+        const renk = yuzde >= 70 ? '#198754' : (yuzde >= 50 ? '#fd7e14' : '#dc3545');
+        const icon = yuzde >= 70 ? 'fa-trophy' : (yuzde >= 50 ? 'fa-thumbs-up' : 'fa-book-open');
+        const mesaj = yuzde >= 70 ? 'Harika bir sonuç!' : (yuzde >= 50 ? 'İyi gidiyorsun, yanlışlarına bir göz at.' : 'Konuyu tekrar edip yanlışlarını incelemende fayda var.');
+
+        const pd = dogru / toplam * 100, py = pd + yanlis / toplam * 100;
+        const halka = `conic-gradient(#198754 0 ${pd}%, #dc3545 ${pd}% ${py}%, #f2c200 ${py}% 100%)`;
+        const filtre = (anahtar, ad, n) =>
+            `<button type="button" data-filtre="${anahtar}" class="${anahtar === 'hepsi' ? 'aktif' : ''}" aria-pressed="${anahtar === 'hepsi'}" ${n === 0 ? 'disabled' : ''}>${ad} (${n})</button>`;
+
+        return `
+            <h4 class="text-center mb-3"><i class="fas ${icon}" style="color: ${renk};"></i> ${esc(testAdi)}</h4>
+            <div class="sonuc-ust">
+                <div class="halka" style="background: ${halka}" role="img" aria-label="Başarı yüzde ${yuzde}">
+                    <div class="halka-ic"><b>${yuzde}%</b><small>Başarı</small></div>
+                </div>
+                <div class="sonuc-kutular">
+                    <div class="sonuc-kutu"><span class="sayi">${toplam}</span><span class="etiket">Toplam soru</span></div>
+                    <div class="sonuc-kutu"><span class="sayi">${cozulen}</span><span class="etiket">Çözülen</span></div>
+                    <div class="sonuc-kutu k-dogru"><span class="sayi">${dogru}</span><span class="etiket"><i class="fas fa-check-circle"></i> Doğru</span></div>
+                    <div class="sonuc-kutu k-yanlis"><span class="sayi">${yanlis}</span><span class="etiket"><i class="fas fa-times-circle"></i> Yanlış</span></div>
+                    <div class="sonuc-kutu k-bos" style="grid-column: 1 / -1"><span class="sayi">${bos}</span><span class="etiket"><i class="fas fa-minus-circle"></i> Boş</span></div>
+                </div>
+            </div>
+            <p class="sonuc-mesaj">${mesaj}</p>
+            <h6 class="text-center mb-2" style="color:#1e2b5c"><i class="fas fa-list-check me-1"></i> Cevap Anahtarı ve Cevapların</h6>
+            <div class="sonuc-filtre" role="group" aria-label="Soruları filtrele">
+                ${filtre('hepsi', 'Tümü', toplam)}${filtre('dogru', 'Doğru', dogru)}${filtre('yanlis', 'Yanlış', yanlis)}${filtre('bos', 'Boş', bos)}
+            </div>
+            <div id="sonucSorular">${detay.map(sonucSoruHtml).join('')}</div>`;
+    }
+
     function testiBitir(e, testId, testAdi) {
         e.preventDefault();
         const testSorulari = sorularByTest.get(testId) || [];
-        const toplamSoru = testSorulari.length;
-        let dogru = 0, yanlis = 0, bos = 0;
-
+        if (!testSorulari.length) return;
         const formData = new FormData(e.target);
-        testSorulari.forEach(soru => {
-            const kullaniciCevap = formData.get(`cevap_${soru.id}`);
-            if (!kullaniciCevap) bos++;
-            else if (kullaniciCevap === soru.dogru_cevap) dogru++;
-            else yanlis++;
+        const detay = testSorulari.map((soru, i) => {
+            const verilen = String(formData.get(`cevap_${soru.id}`) || '');
+            const durum = !verilen ? 'bos' : (verilen === soru.dogru_cevap ? 'dogru' : 'yanlis');
+            return { soru, i, verilen, durum };
         });
-
-        const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100 * 10) / 10 : 0;
-        const renk = yuzde >= 70 ? '#198754' : (yuzde >= 50 ? '#fd7e14' : '#dc3545');
-        const icon = yuzde >= 70 ? 'fa-trophy' : (yuzde >= 50 ? 'fa-thumbs-up' : 'fa-book-open');
-
-        $('modalBody').innerHTML = `
-            <h4 class="text-center mb-4"><i class="fas ${icon}" style="color: ${renk};"></i> ${esc(testAdi)}</h4>
-            <div class="sonuc-detay">
-                <div class="sonuc-item dogru"><i class="fas fa-check-circle fa-2x"></i><span class="sayi">${dogru}</span><span class="label">Doğru</span></div>
-                <div class="sonuc-item yanlis"><i class="fas fa-times-circle fa-2x"></i><span class="sayi">${yanlis}</span><span class="label">Yanlış</span></div>
-                <div class="sonuc-item bos"><i class="fas fa-minus-circle fa-2x"></i><span class="sayi">${bos}</span><span class="label">Boş</span></div>
-                <div class="sonuc-item basari"><i class="fas fa-percent fa-2x"></i><span class="sayi">${yuzde}%</span><span class="label">Başarı</span></div>
-            </div>
-            <div class="text-center mt-3"><small class="text-muted">Toplam ${toplamSoru} soru üzerinden değerlendirilmiştir.</small></div>
-        `;
-        new bootstrap.Modal($('sonucModal')).show();
+        $('modalBody').innerHTML = sonucHtml(testAdi, detay);
+        $('modalBody').scrollTop = 0;
+        bootstrap.Modal.getOrCreateInstance($('sonucModal')).show();
     }
+
+    // Sonuç ekranındaki filtre düğmeleri
+    $('modalBody').addEventListener('click', e => {
+        const b = e.target.closest('[data-filtre]');
+        if (!b || b.disabled) return;
+        const f = b.dataset.filtre;
+        $('modalBody').querySelectorAll('[data-filtre]').forEach(x => {
+            const aktif = x === b;
+            x.classList.toggle('aktif', aktif);
+            x.setAttribute('aria-pressed', aktif);
+        });
+        $('modalBody').querySelectorAll('.sonuc-soru').forEach(el => {
+            el.style.display = (f === 'hepsi' || el.dataset.durum === f) ? '' : 'none';
+        });
+    });
 
     // ---------- Olaylar (tek seferlik, delegasyonla) ----------
     const container = $('sinavIcerik');
