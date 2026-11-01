@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2c3e66">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6WNPZqcMLPjfyTnMzvKYX/m9EzvShZUGr4qFraHDZeM=' https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://*.firebaseio.com; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-4WD48nCkVB0F/k0i18KiN7RKMxd6Kn5yEbxEnj5JjRc=' https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-src https://*.firebaseio.com; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light">
 <meta name="mobile-web-app-capable" content="yes">
@@ -46,18 +46,15 @@ button.gray{background:var(--line);color:#4a5568;margin-top:12px}
 .wel{background:var(--grad);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;text-align:center}
 .top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
 .out{width:auto;padding:10px 20px;background:#edf2f7;color:#4a5568;border:1px solid var(--line);font-size:14px;font-weight:600}
-.menu-btn{width:auto;display:inline-flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 18px;background:#fff;color:var(--navy);border:1.5px solid var(--line);font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.menu-btn:hover{background:var(--soft)}
-.menu-btn .bars{font-size:18px;line-height:1}
-.dbg{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
-.drawer{position:fixed;top:0;bottom:0;left:0;z-index:1000;width:min(300px,84vw);display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);background:#fff;box-shadow:8px 0 30px rgba(0,0,0,.18);transform:translateX(-102%);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
-.dw.open .dbg{opacity:1;visibility:visible;transition:opacity .25s}
-.dw.open .drawer{transform:none;visibility:visible;transition:transform .25s ease}
-.dhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px;background:var(--grad);color:#fff;font-weight:700;font-size:17px}
-.dclose{width:auto;min-height:40px;padding:6px 12px;background:rgba(255,255,255,.15);font-size:16px}
-.dnav{list-style:none;padding:8px 0;overflow-y:auto}
-.dnav a{display:block;padding:16px 22px;color:#4a5568;font-weight:600;font-size:16px;text-decoration:none;border-left:4px solid transparent;border-bottom:1px solid #edf2f7}
-.dnav a:hover,.dnav a.active{color:var(--navy);border-left-color:var(--navy);background:rgba(44,62,102,.05)}
+.navbar{background:#fff;border-radius:16px;margin-bottom:28px;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden}
+.nav-t{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:16px 20px;background:var(--grad);color:#fff;border-radius:0;font-size:16px;font-weight:600;text-align:left}
+.nav-t .ch{flex:none;font-size:12px;transition:transform .25s}
+.navbar.open .ch{transform:rotate(180deg)}
+.nav-b{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .25s ease,visibility 0s .25s}
+.navbar.open .nav-b{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .25s ease}
+.nl{list-style:none;min-height:0;overflow:hidden}
+.nl a{display:block;padding:16px 22px;color:#4a5568;font-weight:600;font-size:15px;text-decoration:none;border-left:4px solid transparent;border-top:1px solid #edf2f7}
+.nl a:hover,.nl a.active{color:var(--navy);border-left-color:var(--navy);background:rgba(44,62,102,.05)}
 .class-card{background:var(--grad);color:#fff;padding:24px;border-radius:20px;margin-bottom:24px;text-align:center}
 .class-card h3{font-size:22px;margin-bottom:8px}
 .class-card p{opacity:.85;font-size:13px}
@@ -70,7 +67,7 @@ button,.sm{min-height:44px}.btn{display:inline-flex;align-items:center;justify-c
 input,select{min-height:48px}.ah{min-height:52px}
 @media(min-width:769px) and (max-width:1100px){.main{padding:28px 20px}.card{padding:28px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media print{.topbar,.menu-btn,.dw,.out,button{display:none!important}body{background:#fff}}
+@media print{.topbar,.navbar,.out,button{display:none!important}body{background:#fff}}
 @media(max-width:768px){.main.narrow{padding:16px 12px}.card{padding:20px}.slesson{flex-direction:column;align-items:flex-start}.btn{width:100%}.top{flex-direction:column;align-items:stretch}.out{width:100%}}
 @media(max-width:400px){.card{padding:16px;border-radius:16px}}
 </style>
@@ -180,19 +177,14 @@ const U = {
     </div>`;
 
   const panelView = (user, cls, lessons) => `
-    <div class="card">
-      <button class="menu-btn" type="button" data-a="menu" aria-expanded="false" aria-controls="drawer"><span class="bars" aria-hidden="true">☰</span> Menü</button>
-      ${welcome(user)}
-      <div class="dw" id="dw">
-        <div class="dbg" data-a="menuClose"></div>
-        <nav class="drawer" id="drawer" aria-label="Ana menü">
-          <div class="dhead"><span>Menü</span><button class="dclose" type="button" data-a="menuClose" aria-label="Menüyü kapat">✕</button></div>
-          <ul class="dnav">
-            <li><a class="active" href="ogrenci.html" data-a="menuClose" aria-current="page">Derslerim</a></li>
-            ${LINKS.map(([t, u]) => `<li><a href="${u}" rel="noopener noreferrer">${t}</a></li>`).join('')}
-          </ul>
-        </nav>
-      </div>
+    <div class="card">${welcome(user)}
+      <nav class="navbar" id="nav" aria-label="Ana menü">
+        <button class="nav-t" type="button" data-a="nav" aria-expanded="false" aria-controls="navl"><span>Derslerim</span><span class="ch" aria-hidden="true">▼</span></button>
+        <div class="nav-b" id="navl"><ul class="nl">
+          <li><a class="active" href="ogrenci.html" aria-current="page">Derslerim</a></li>
+          ${LINKS.map(([t, u]) => `<li><a href="${u}" rel="noopener noreferrer">${t}</a></li>`).join('')}
+        </ul></div>
+      </nav>
       <h2>Derslerim</h2>` +
     (cls ? `
       <div class="class-card"><h3>${esc(cls.class_name)}</h3><p>Kayıt: ${fd(cls.created_at, false)}</p></div>
@@ -262,21 +254,19 @@ const U = {
     render();
   });
 
-  const setMenu = open => {
-    const w = document.getElementById('dw'), b = app.querySelector('.menu-btn');
-    if (!w || w.classList.contains('open') === open) return;
-    w.classList.toggle('open', open);
-    b.setAttribute('aria-expanded', open);
-    (open ? w.querySelector('.dclose') : b).focus();
+  const setNav = open => {
+    const n = document.getElementById('nav');
+    if (!n) return;
+    n.classList.toggle('open', open);
+    n.querySelector('.nav-t').setAttribute('aria-expanded', open);
   };
 
   app.addEventListener('click', async e => {
     const a = e.target.closest('[data-a]')?.dataset.a;
-    if (a === 'menu') return setMenu(true);
-    if (a === 'menuClose') { e.preventDefault(); return setMenu(false); }
+    if (a === 'nav') return setNav(!document.getElementById('nav').classList.contains('open'));
     if (a === 'logout') await signOut(auth);
   });
-  addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') setNav(false); });
 
   onAuthStateChanged(auth, () => { if (orphan) { orphan = false; return; } render(); });
 })();
