@@ -208,7 +208,7 @@ const U = {
   const app = document.getElementById('app');
   const LINKS = [
     ['Ders Programım', 'https://mektepiq1.github.io/d-mekan/dersprogram.html'],
-    ['Defter', 'https://mektepiq1.github.io/cay/cizgilideff.html']
+    ['Defter', 'https://mektepiq1.github.io/d-mekan/cizgilideff.html']
   ];
   let reqView = false, pend = null, pickData = null;
   let error = '', notice = '', leftMsg = '', awaitInstall = false, lastUser = '', orphan = false, busy = false;
