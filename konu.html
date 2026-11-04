@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<script src="kapi.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1f44">
+<title>Öğrenci Bahçesi — Konu anlatımı</title>
+<style>
+/* Öğrenci Bahçesi — beyaz & lacivert tema */
+:root{
+  --navy-950:#071633; --navy-900:#0a1f44; --navy-800:#10295a; --navy-700:#1b3a73;
+  --navy-600:#2a4d8f; --navy-300:#9fb3d6; --navy-200:#c9d5ea; --navy-100:#e6ecf7;
+  --navy-50:#f4f7fc; --white:#fff; --danger:#b42318; --danger-bg:#fdecea;
+  --radius:12px; --shadow:0 2px 10px rgba(10,31,68,.08); --t:.28s;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--navy-50);color:var(--navy-900);
+  font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+[hidden]{display:none!important}
+a{color:var(--navy-600)}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+main.wrap{padding-top:22px;padding-bottom:60px}
+
+/* Üst çubuk */
+.topbar{background:linear-gradient(135deg,var(--navy-950),var(--navy-800));color:#fff;
+  position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(7,22,51,.25)}
+.bar{display:flex;align-items:center;justify-content:space-between;min-height:58px;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:700;font-size:18px}
+.brand svg{width:28px;height:28px;flex:none}
+.nav-link{color:var(--navy-200);text-decoration:none;font-size:14px;padding:7px 12px;border-radius:8px}
+.nav-link:hover,.nav-link:focus-visible{background:rgba(255,255,255,.12);color:#fff}
+
+.page-title{font-size:24px;margin:0 0 4px}
+.lead{margin:0 0 18px;color:var(--navy-600);font-size:14px}
+.muted{color:var(--navy-600);font-size:13px}
+
+/* Kartlar & formlar */
+.card{background:#fff;border:1px solid var(--navy-200);border-radius:var(--radius);
+  padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+.card h2{font-size:16px;margin:0 0 12px}
+.field{display:block;margin-bottom:12px}
+.field>span{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--navy-800)}
+input[type=text],input[type=search],textarea{width:100%;padding:11px 12px;border:1px solid var(--navy-300);
+  border-radius:10px;background:#fff;color:var(--navy-900);font:inherit;font-size:16px;outline:none;
+  transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus{border-color:var(--navy-600);box-shadow:0 0 0 3px rgba(42,77,143,.18)}
+textarea{resize:vertical;min-height:150px;line-height:1.5}
+.inline-form{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.inline-form .field{flex:1;min-width:200px;margin:0}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* Butonlar */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:10px;
+  border:1px solid transparent;font:inherit;font-weight:600;font-size:15px;cursor:pointer;text-decoration:none;
+  transition:background .2s,transform .1s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible,.icon-btn:focus-visible{outline:2px solid var(--navy-600);outline-offset:2px}
+.btn-primary{background:var(--navy-900);color:#fff}
+.btn-primary:hover{background:var(--navy-700)}
+.btn-ghost{background:#fff;color:var(--navy-800);border-color:var(--navy-300)}
+.btn-ghost:hover{background:var(--navy-100)}
+.icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;
+  border:1px solid transparent;background:transparent;color:var(--navy-700);font-size:14px;cursor:pointer;flex:none}
+.icon-btn:hover:not(:disabled){background:var(--navy-100)}
+.icon-btn:disabled{opacity:.3;cursor:default}
+.icon-btn.danger:hover:not(:disabled){background:var(--danger-bg);color:var(--danger)}
+
+/* Arama */
+.searchbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.searchbar input{flex:1;min-width:180px}
+.stats{font-size:13px;color:var(--navy-600);margin:0 2px 12px}
+
+/* Akordeon (grid animasyonu: max-height yok, takılma yok) */
+.acc{background:#fff;border:1px solid var(--navy-200);border-radius:var(--radius);margin-bottom:10px;
+  overflow:hidden;box-shadow:var(--shadow)}
+.acc.sub{background:var(--navy-50);border-radius:10px;margin-bottom:8px;box-shadow:none}
+.acc-row{display:flex;align-items:stretch}
+.acc-head{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;background:transparent;border:0;color:var(--navy-900);font:inherit;font-weight:600;
+  text-align:left;cursor:pointer;transition:background .2s}
+.acc-head:hover{background:var(--navy-50)}
+.acc.sub .acc-head:hover{background:var(--navy-100)}
+.acc-head:focus-visible{outline:2px solid var(--navy-600);outline-offset:-2px}
+.acc-title{display:flex;align-items:center;gap:10px;min-width:0;overflow-wrap:break-word}
+.acc-meta{display:flex;align-items:center;gap:10px;flex:none}
+.chev{width:9px;height:9px;border-right:2px solid var(--navy-600);border-bottom:2px solid var(--navy-600);
+  transform:rotate(45deg);transition:transform var(--t);margin:0 4px 3px 0}
+.acc.open>.acc-head .chev,.acc.open>.acc-row .acc-head .chev{transform:rotate(225deg)}
+.acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--t) ease}
+.acc.open>.acc-body{grid-template-rows:1fr;border-top:1px solid var(--navy-100)}
+.acc-inner{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s var(--t)}
+.acc.open>.acc-body>.acc-inner{visibility:visible;transition-delay:0s}
+.sub-list,.panel{padding:12px}
+.badge{font-size:12px;font-weight:700;background:var(--navy-100);color:var(--navy-800);
+  padding:2px 9px;border-radius:999px;white-space:nowrap}
+.badge.solid{background:var(--navy-900);color:#fff;border-radius:6px;white-space:normal;
+  overflow-wrap:break-word;padding:3px 10px}
+
+/* Not metni: güvenli (textContent), uzun metinde kendi içinde kayar */
+.note{white-space:pre-wrap;overflow-wrap:break-word;max-height:min(60vh,520px);overflow:auto;
+  padding:14px 16px;margin:0;background:#fff;border:1px solid var(--navy-100);border-radius:8px;
+  line-height:1.75;font-size:15px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.note::-webkit-scrollbar{width:8px}
+.note::-webkit-scrollbar-thumb{background:var(--navy-300);border-radius:4px}
+
+.empty{text-align:center;color:var(--navy-600);padding:36px 12px}
+.empty p{margin:0 0 14px}
+
+/* Yönetim paneli */
+.row-actions{display:flex;align-items:center;gap:2px;padding-right:6px;flex:none}
+.acc-row .row-actions{padding-left:2px}
+.page-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;
+  border:1px solid var(--navy-200);border-radius:10px;padding:8px 8px 8px 12px;margin-bottom:8px}
+.page-info{min-width:0;display:flex;flex-direction:column;overflow-wrap:break-word}
+.subform{background:#fff;border:1px dashed var(--navy-300);border-radius:10px;padding:14px;margin-top:12px}
+.subform-title{font-size:14px;margin:0 0 10px;color:var(--navy-800)}
+.meter{height:8px;background:var(--navy-100);border-radius:99px;overflow:hidden;margin:8px 0}
+.meter>i{display:block;height:100%;width:0;background:var(--navy-700);transition:width .3s}
+.meter.warn>i{background:var(--danger)}
+.backup-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+/* Bildirim */
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--navy-900);color:#fff;
+  padding:11px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  max-width:92vw;z-index:50;font-size:14px;box-shadow:0 6px 20px rgba(7,22,51,.3)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{background:var(--danger)}
+
+@media (max-width:480px){
+  .acc-head{padding:13px 12px}
+  .btn{padding:11px 12px}
+  .acc-meta .muted{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important}
+}
+
+/* ===== Duyarlı tasarım: telefon, tablet, bilgisayar ===== */
+html{scroll-behavior:smooth}
+body{min-height:100vh;min-height:100dvh;overflow-x:hidden}
+.wrap{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.topbar{padding-top:env(safe-area-inset-top)}
+#toast{bottom:max(22px,env(safe-area-inset-bottom))}
+.note{max-height:min(60vh,520px);max-height:min(60dvh,520px)}
+
+/* Dokunmatik ekranlarda büyük dokunma alanları */
+@media (pointer:coarse){
+  .btn{min-height:44px}
+  .icon-btn{width:44px;height:44px;font-size:16px}
+  .acc-head{min-height:52px}
+  input[type=text],input[type=search]{min-height:46px}
+}
+
+/* Küçük telefon */
+@media (max-width:420px){
+  .page-title{font-size:21px}
+  .card{padding:14px}
+  .inline-form .btn{width:100%}
+  .row-actions{flex-wrap:wrap;justify-content:flex-end;max-width:132px}
+  .page-row{align-items:flex-start}
+  .backup-actions .btn{flex:1}
+}
+
+/* Tablet */
+@media (min-width:640px){
+  .wrap{max-width:820px;padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+  .page-title{font-size:28px}
+  .card{padding:22px}
+  .acc-head{padding:16px 20px;font-size:17px}
+  .acc.sub .acc-head{font-size:15px}
+  .sub-list,.panel{padding:16px}
+  .note{font-size:16px;padding:18px 20px}
+}
+
+/* Bilgisayar */
+@media (min-width:1024px){
+  .wrap{max-width:980px}
+  main.wrap{padding-top:34px}
+  .note{max-height:min(65vh,640px);font-size:16.5px}
+}
+@media (min-width:1400px){
+  .wrap{max-width:1080px}
+}
+
+/* Yatay telefon */
+@media (max-height:480px) and (orientation:landscape){
+  .topbar{position:static}
+  .note{max-height:70vh}
+}
+@media print{
+  .topbar,.searchbar,#toast{display:none}
+  .acc-body{grid-template-rows:1fr!important}
+  .acc-inner{visibility:visible!important}
+  .note{max-height:none;overflow:visible}
+}
+
+
+/* ===== Taşma / dolma önlemleri ===== */
+html,body{max-width:100%}
+h1,h2,h3,p,strong,span,label,a,button{overflow-wrap:break-word;word-break:normal}
+.wrap,.card,.acc,.acc-inner,.panel,.sub-list,.page-row,.page-info,.field,.inline-form>*{min-width:0}
+.acc-head{min-width:0}
+.acc-title{flex:1 1 auto;min-width:0}
+.acc-title>span{min-width:0;overflow-wrap:break-word}
+.acc-title>span[aria-hidden]{flex:none}
+.acc-meta{flex:0 0 auto}
+.badge{max-width:100%}
+.badge.solid{display:inline-block;max-width:100%;line-height:1.35;white-space:normal;overflow-wrap:break-word}
+.btn{white-space:normal;text-align:center;max-width:100%;line-height:1.3}
+.page-info strong{overflow-wrap:break-word}
+.note{overflow-wrap:break-word;max-width:100%}
+input[type=text],input[type=search],textarea{max-width:100%;min-width:0}
+.acc{scroll-margin-top:76px}
+.stats,.lead,.muted{overflow-wrap:break-word}
+
+/* ===== Düzen onarımı: başlık sıkışmasını önle, butonlar ayrı satırda ===== */
+.acc-title{align-items:flex-start}
+.acc-title>span[aria-hidden]{margin-top:1px}
+.acc-title>span:last-child{flex:1 1 auto;line-height:1.35}
+.acc-head{align-items:center}
+
+@media (max-width:639px){
+  /* Konu başlığı tam genişlik, işlem butonları altında tek sırada */
+  .acc-row{flex-direction:column}
+  .acc-row .row-actions{max-width:none;flex-wrap:nowrap;justify-content:stretch;gap:4px;
+    padding:6px 10px;background:var(--navy-50);border-top:1px solid var(--navy-100)}
+  .acc-row .row-actions .icon-btn,
+  .page-row .row-actions .icon-btn{flex:1 1 0;width:auto;max-width:none;height:42px;border-color:var(--navy-100);background:#fff}
+  /* Sayfa satırı: ad üstte, butonlar altta */
+  .page-row{flex-direction:column;align-items:stretch;padding:10px}
+  .page-row .row-actions{max-width:none;flex-wrap:nowrap;gap:4px;padding:0;justify-content:stretch}
+  .page-info{flex:none}
+  .acc-meta{gap:8px}
+}
+@media (min-width:640px){
+  .acc-row .row-actions{align-self:center;padding-right:10px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap bar">
+    <a class="brand" href="konu.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 12c0-4 3-7 8-7 0 5-3 7-8 7z"/><path d="M12 14c0-3-2.5-5-7-5 0 4 2.5 5 7 5z"/></svg><span>Öğrenci Bahçesi</span></a>
+  </div>
+</header>
+<main class="wrap">
+  <h1 class="page-title">KONU ANLATIMI</h1>
+  <p class="lead">Konuyu seç, sayfayı aç, çalışmaya başla.</p>
+  <div class="searchbar">
+    <input id="ara" type="search" placeholder="Konu, sayfa veya not içinde ara…" autocomplete="off" aria-label="Ara">
+    <button id="hepsi" class="btn btn-ghost" type="button" hidden>Tümünü Aç</button>
+  </div>
+  <p id="istatistik" class="stats" aria-live="polite"></p>
+  <div id="liste"></div>
+  <noscript><p class="empty">Bu uygulama için JavaScript gerekli.</p></noscript>
+</main>
+<script>
+/* Öğrenci Bahçesi — ortak yardımcılar (depolama, DOM, bildirim) */
+(function (global) {
+  'use strict';
+
+  const KEY = 'dersKonulariYeni'; // eski verilerle uyumlu
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+  const str = v => (v == null ? '' : String(v));
+  const lc = s => str(s).toLocaleLowerCase('tr');
+
+  /* Güvenli DOM üretici: metinler hep textContent ile yazılır (XSS yok) */
+  function el(tag, props, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') n.className = v;
+      else if (k === 'text') n.textContent = v;
+      else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) if (kid != null && kid !== false) n.append(kid);
+    return n;
+  }
+
+  /* Veriyi doğrula / eski formatı yeni formata taşı (id ekle) */
+  function normalize(raw) {
+    if (raw && !Array.isArray(raw) && Array.isArray(raw.konular)) raw = raw.konular;
+    if (!Array.isArray(raw)) return { data: [], changed: raw != null };
+    let changed = false;
+    const seen = new Set();
+    const newId = cur => {
+      if (typeof cur === 'string' && cur && !seen.has(cur)) { seen.add(cur); return cur; }
+      changed = true;
+      let id; do { id = uid(); } while (seen.has(id));
+      seen.add(id); return id;
+    };
+    const data = [];
+    for (const k of raw) {
+      if (!k || typeof k !== 'object') { changed = true; continue; }
+      const sayfalar = [];
+      for (const s of (Array.isArray(k.sayfalar) ? k.sayfalar : [])) {
+        if (!s || typeof s !== 'object') { changed = true; continue; }
+        sayfalar.push({
+          id: newId(s.id),
+          sayfaAdi: str(s.sayfaAdi).trim() || 'Adsız sayfa',
+          icerik: str(s.icerik)
+        });
+      }
+      data.push({ id: newId(k.id), konuAdi: str(k.konuAdi).trim() || 'Adsız konu', sayfalar });
+    }
+    return { data, changed };
+  }
+
+  function save(data) {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); return true; }
+    catch (e) { return false; }
+  }
+
+  function load() {
+    let raw = null;
+    try {
+      const t = localStorage.getItem(KEY);
+      if (t) {
+        try { raw = JSON.parse(t); }
+        catch (e) { try { localStorage.setItem(KEY + '_bozuk_yedek', t); } catch (_) {} }
+      }
+    } catch (e) { /* depolama kapalı olabilir */ }
+    const { data, changed } = normalize(raw);
+    if (changed && raw != null) save(data);
+    return data;
+  }
+
+  function usage() {
+    try { return (KEY.length + (localStorage.getItem(KEY) || '').length) * 2; }
+    catch (e) { return 0; }
+  }
+
+  function fmtBytes(b) {
+    return b < 1024 ? b + ' B' : b < 1048576 ? Math.round(b / 1024) + ' KB' : (b / 1048576).toFixed(2) + ' MB';
+  }
+
+  function onChange(cb) {
+    window.addEventListener('storage', e => { if (e.key === KEY || e.key === null) cb(); });
+    window.addEventListener('pageshow', e => { if (e.persisted) cb(); }); // geri tuşu / bfcache
+  }
+
+  let tt;
+  function toast(msg, type) {
+    let t = document.getElementById('toast');
+    if (!t) { t = el('div', { id: 'toast', role: 'status', 'aria-live': 'polite' }); document.body.append(t); }
+    t.textContent = msg;
+    t.className = 'show ' + (type || 'ok');
+    clearTimeout(tt);
+    tt = setTimeout(() => { t.className = ''; }, type === 'err' ? 4500 : 2500);
+  }
+
+  global.OB = { KEY, uid, el, lc, load, save, normalize, usage, fmtBytes, onChange, toast };
+})(window);
+
+</script>
+<script>
+/* Öğrenci Bahçesi — ders notları sayfası */
+(function () {
+  'use strict';
+  const { el, load, onChange, lc } = OB;
+  const $ = id => document.getElementById(id);
+  const listEl = $('liste'), qEl = $('ara'), statEl = $('istatistik'), allBtn = $('hepsi');
+
+  let konular = [];
+  let qRaw = '', query = '';
+  const openT = new Set(), openP = new Set();
+  const pageMap = new Map();   // id -> sayfa
+  const lcCache = new Map();   // id -> küçük harfli içerik (arama için, bir kez hesaplanır)
+
+  const lowerOf = p => {
+    let v = lcCache.get(p.id);
+    if (v === undefined) { v = lc(p.icerik); lcCache.set(p.id, v); }
+    return v;
+  };
+  const readMin = p => Math.max(1, Math.round(p.icerik.length / 1200));
+
+  function filtrele() {
+    if (!query) return konular.map(k => ({ k, pages: k.sayfalar }));
+    const out = [];
+    for (const k of konular) {
+      if (lc(k.konuAdi).includes(query)) { out.push({ k, pages: k.sayfalar }); continue; }
+      const pages = k.sayfalar.filter(p => lc(p.sayfaAdi).includes(query) || lowerOf(p).includes(query));
+      if (pages.length) out.push({ k, pages });
+    }
+    return out;
+  }
+
+  function pageNode(p) {
+    pageMap.set(p.id, p);
+    const open = openP.has(p.id);
+    const acc = el('div', { class: 'acc sub' + (open ? ' open' : ''), 'data-id': p.id },
+      el('button', { class: 'acc-head', type: 'button', 'aria-expanded': String(open), 'data-toggle': 'page' },
+        el('span', { class: 'acc-title' }, el('span', { class: 'badge solid', text: p.sayfaAdi })),
+        el('span', { class: 'acc-meta' },
+          el('span', { class: 'muted', text: '~' + readMin(p) + ' dk' }),
+          el('span', { class: 'chev', 'aria-hidden': 'true' }))),
+      el('div', { class: 'acc-body' }, el('div', { class: 'acc-inner' })));
+    if (open) fillPage(acc);
+    return acc;
+  }
+
+  // İçerik yalnızca sayfa ilk açıldığında DOM'a eklenir (büyük notlarda hız)
+  function fillPage(acc) {
+    const inner = acc.querySelector(':scope > .acc-body > .acc-inner');
+    if (!inner || inner.dataset.filled) return;
+    const p = pageMap.get(acc.dataset.id);
+    if (!p) return;
+    inner.append(el('div', { class: 'note', tabindex: '0', text: p.icerik }));
+    inner.dataset.filled = '1';
+  }
+
+  function topicNode(k, pages) {
+    const open = openT.has(k.id) || !!query;
+    return el('section', { class: 'acc' + (open ? ' open' : ''), 'data-id': k.id },
+      el('button', { class: 'acc-head', type: 'button', 'aria-expanded': String(open), 'data-toggle': 'topic' },
+        el('span', { class: 'acc-title' }, el('span', { 'aria-hidden': 'true', text: '📖' }), el('span', { text: k.konuAdi })),
+        el('span', { class: 'acc-meta' },
+          el('span', { class: 'badge', text: pages.length + ' sayfa' }),
+          el('span', { class: 'chev', 'aria-hidden': 'true' }))),
+      el('div', { class: 'acc-body' },
+        el('div', { class: 'acc-inner' },
+          el('div', { class: 'sub-list' },
+            pages.length ? pages.map(pageNode) : el('p', { class: 'muted', text: 'Bu konuya henüz sayfa eklenmemiş.' })))));
+  }
+
+  function emptyBox(msg) {
+    return el('div', { class: 'empty' }, el('p', { text: msg }));
+  }
+
+  function syncAllBtn() {
+    const tops = listEl.querySelectorAll(':scope > .acc');
+    allBtn.hidden = tops.length === 0;
+    const allOpen = tops.length > 0 && [...tops].every(a => a.classList.contains('open'));
+    allBtn.textContent = allOpen ? 'Tümünü Kapat' : 'Tümünü Aç';
+  }
+
+  function render() {
+    pageMap.clear();
+    const rows = filtrele();
+    const frag = document.createDocumentFragment();
+    if (!konular.length) frag.append(emptyBox('Henüz ders notu eklenmemiş.'));
+    else if (!rows.length) frag.append(emptyBox('“' + qRaw + '” için sonuç bulunamadı.'));
+    else for (const r of rows) frag.append(topicNode(r.k, r.pages));
+    listEl.replaceChildren(frag);
+    const sp = konular.reduce((n, k) => n + k.sayfalar.length, 0);
+    statEl.textContent = konular.length + ' konu · ' + sp + ' sayfa' + (query ? ' · ' + rows.length + ' konuda eşleşme' : '');
+    syncAllBtn();
+  }
+
+  function setOpen(acc, open) {
+    acc.classList.toggle('open', open);
+    const btn = acc.querySelector(':scope > .acc-head');
+    btn.setAttribute('aria-expanded', String(open));
+    const isTopic = btn.dataset.toggle === 'topic';
+    const set = isTopic ? openT : openP;
+    open ? set.add(acc.dataset.id) : set.delete(acc.dataset.id);
+    if (open && !isTopic) fillPage(acc);
+  }
+
+  // Tek olay dinleyici (event delegation)
+  listEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-toggle]');
+    if (!btn) return;
+    const acc = btn.parentElement;
+    const willOpen = !acc.classList.contains('open');
+    // Bir sayfa açılınca aynı konudaki diğer açık sayfalar kapanır
+    if (willOpen && btn.dataset.toggle === 'page') {
+      acc.parentElement.querySelectorAll(':scope > .acc.open').forEach(s => { if (s !== acc) setOpen(s, false); });
+    }
+    setOpen(acc, willOpen);
+    syncAllBtn();
+    if (willOpen && btn.dataset.toggle === 'page') {
+      setTimeout(() => acc.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
+    }
+  });
+
+  allBtn.addEventListener('click', () => {
+    const tops = [...listEl.querySelectorAll(':scope > .acc')];
+    const allOpen = tops.every(a => a.classList.contains('open'));
+    if (allOpen) {
+      listEl.querySelectorAll('.acc.open').forEach(a => setOpen(a, false));
+    } else {
+      tops.forEach(a => setOpen(a, true));
+    }
+    syncAllBtn();
+  });
+
+  let timer;
+  qEl.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { qRaw = qEl.value.trim(); query = lc(qRaw); render(); }, 180);
+  });
+
+  function yenile() { konular = load(); lcCache.clear(); render(); }
+  onChange(yenile);
+  yenile();
+})();
+
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+const config = { apiKey: "AIzaSyAtqtkB4mYY7t1HCM3umVLxRC2un30_-fQ", authDomain: "ogrenciveyonetim.firebaseapp.com", projectId: "ogrenciveyonetim", appId: "1:660345359561:web:5c74d90d8624c8e4c75118", databaseURL: "https://ogrenciveyonetim-default-rtdb.firebaseio.com" };
+const KEY = 'dersKonulariYeni', VER = 'konu_surum';
+const app = initializeApp(config), db = getDatabase(app), auth = getAuth(app);
+const user = await new Promise(r => { const off = onAuthStateChanged(auth, x => { off(); r(x); }); });
+if (!user) location.replace('ogrenci.html');
+else if (navigator.onLine) {
+  const sure = p => Promise.race([p, new Promise((_, j) => setTimeout(() => j(new Error('zaman')), 8000))]);
+  try {
+    const v = (await sure(get(ref(db, 'sb/anlatim/surum')))).val();
+    if (v && String(v) !== localStorage.getItem(VER)) {
+      const o = (await sure(get(ref(db, 'sb/anlatim/konular')))).val() || {};
+      const by = (a, b) => (a[1].sira || 0) - (b[1].sira || 0);
+      const list = Object.entries(o).sort(by).map(([id, k]) => ({ id, konuAdi: k.konuAdi, sayfalar: Object.entries(k.sayfalar || {}).sort(by).map(([sid, p]) => ({ id: sid, sayfaAdi: p.sayfaAdi, icerik: p.icerik })) }));
+      localStorage.setItem(KEY, JSON.stringify(list)); localStorage.setItem(VER, String(v));
+      dispatchEvent(new StorageEvent('storage', { key: KEY }));
+    }
+  } catch (e) {}
+}
+</script>
+</body>
+</html>
