@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#131314">
+<title>Öğrenci Kitap – Yönetim</title>
+<style>
+  :root{--bg:#131314;--surface:#1e1f20;--surface-2:#2a2b2d;--line:#34363a;--text:#e3e3e3;--muted:#a8abb0;--accent:#8ab4f8;--accent-d:#4f8cff;--danger:#f28b82;--ok:#81c995;--radius:14px}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Roboto,system-ui,-apple-system,Arial,sans-serif;min-height:100vh;padding-bottom:60px}
+  header{position:sticky;top:0;z-index:20;background:rgba(19,19,20,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;gap:12px}
+  header h1{font-size:19px;font-weight:600;flex:1}
+  .btn{border:0;border-radius:10px;padding:11px 18px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:filter .2s,transform .1s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;color:var(--text);background:var(--surface-2)}
+  .btn:hover:not(:disabled){filter:brightness(1.15)}.btn:active:not(:disabled){transform:scale(.97)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent-d),#7a5cff);color:#fff}
+  .btn.danger{background:rgba(242,139,130,.14);color:var(--danger)}
+  .btn.sm{padding:8px 12px;font-size:13px}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .wrap{max-width:1100px;margin:0 auto;padding:22px 20px;display:grid;gap:22px}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .panel h2{font-size:16px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
+  input[type=text],input[type=search],input[type=number],textarea,select{width:100%;background:#17181a;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px 14px;font:inherit;font-size:15px;outline:none;transition:border .2s}
+  select{cursor:pointer}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+  textarea{min-height:240px;resize:vertical;line-height:1.55}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .row input[type=text],.row input[type=search]{flex:1;min-width:200px}
+  .row select{flex:0 1 240px;min-width:160px}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+
+  .catlist{display:grid;gap:10px;margin-top:16px}
+  .catrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#17181a;border:1px solid var(--line);border-radius:12px;padding:8px}
+  .catrow input{flex:1;min-width:150px;border:0;background:transparent;padding:8px 10px}
+  .catrow input:focus{background:rgba(255,255,255,.05);border-radius:8px}
+  .catrow .cnt{font-size:12px;color:var(--muted);min-width:64px;text-align:right}
+
+  .drop{border:2px dashed #45484d;border-radius:var(--radius);padding:30px 16px;text-align:center;color:var(--muted);cursor:pointer;transition:.2s;margin-top:14px}
+  .drop:hover,.drop.over{border-color:var(--accent);background:rgba(138,180,248,.06);color:var(--text)}
+  .drop strong{color:var(--accent)}
+  .drop small{display:block;margin-top:6px;font-size:12px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px;max-height:470px;overflow-y:auto;padding:4px 4px 8px;scrollbar-width:thin;scrollbar-color:#45484d transparent;margin-top:12px}
+  .thumb{cursor:pointer;background:none;border:0;color:inherit;font:inherit;text-align:left;position:relative;min-width:0}
+  .thumb .c{aspect-ratio:247/385;border-radius:10px;overflow:hidden;border:2px solid transparent;background:var(--surface-2);transition:.2s}
+  .thumb.sel .c{border-color:var(--accent);box-shadow:0 0 0 3px rgba(138,180,248,.25)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .n{font-size:12px;margin-top:6px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .thumb .k{font-size:11px;color:#6f7378;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badge{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#0b2d14;font-size:13px;display:grid;place-items:center;font-weight:700}
+  .idx{position:absolute;top:6px;left:6px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;display:grid;place-items:center}
+  .empty{padding:26px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1}
+
+  .editor{display:grid;grid-template-columns:220px 1fr;gap:24px}
+  .preview{aspect-ratio:247/385;border-radius:12px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:10px}
+  .preview img{width:100%;height:100%;object-fit:cover;display:block}
+  .movers{display:flex;gap:8px;margin-top:10px}
+  .movers .btn{flex:1;justify-content:center}
+  .posrow{display:flex;gap:8px;margin-top:8px}
+  .posrow input{width:80px;padding:8px 10px;font-size:14px}
+  .posrow .btn{flex:1;justify-content:center}
+  .small-note{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .counter{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;margin-top:4px;gap:10px;flex-wrap:wrap}
+  .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  @media(max-width:700px){.editor{grid-template-columns:1fr}.preview{max-width:200px}}
+
+  .meter{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden;margin-top:10px}
+  .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4f8cff,#8a5cff);transition:width .4s}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,30px);background:#2d2e31;border:1px solid var(--line);padding:12px 20px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:50;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* Çekmece panelleri */
+  .panel.acc>h2{cursor:pointer;margin-bottom:0;justify-content:flex-start;-webkit-tap-highlight-color:transparent;user-select:none}
+  .panel.acc.open>h2{margin-bottom:14px}
+  .panel.acc>h2 .chev{margin-left:auto;width:34px;height:34px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+  .panel.acc>h2 .chev svg{width:18px;height:18px}
+  .panel.acc.open>h2 .chev{transform:rotate(180deg)}
+  .adrawer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.22,1,.36,1)}
+  .panel.acc.open>.adrawer{grid-template-rows:1fr}
+  .adrawer-inner{min-height:0;overflow:hidden;opacity:0;transform:translateY(-10px);transition:opacity .35s ease,transform .5s cubic-bezier(.22,1,.36,1)}
+  .panel.acc.open>.adrawer>.adrawer-inner{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.adrawer,.adrawer-inner,.panel.acc>h2 .chev{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Yönetim Paneli</h1>
+  <a class="btn" href="ogrencikitap.html" target="_blank" rel="noopener">Siteyi gör ↗</a>
+</header>
+
+<div class="wrap">
+  <section class="panel">
+    <h2>Kategoriler <span id="catCount" style="color:var(--muted);font-weight:400"></span></h2>
+    <div class="row">
+      <input type="text" id="newCat" placeholder="Yeni kategori adı (örn. Alacakaranlık, Sanat…)" maxlength="60">
+      <button class="btn primary" id="addCat">Kategori ekle</button>
+    </div>
+    <div class="catlist" id="catList"></div>
+    <div class="hint">Her kategori, kullanıcı sayfasında kendi çekmecesi olarak görünür. Adı değiştirmek için kutuya yazıp başka yere dokunun. Yukarı/aşağı okları çekmecelerin sırasını belirler. Kategoriyi silerseniz içindeki kitaplar silinmez, “Kategorisiz” olur ve kullanıcı sayfasında “Diğer” çekmecesinde görünür.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Kitap / görsel ekle</h2>
+    <label for="uploadCat" style="margin-top:0">Eklenecek kategori</label>
+    <div class="row"><select id="uploadCat"></select></div>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Görsel seç">
+      <div><strong>Görsel seçmek için tıklayın</strong> veya buraya sürükleyin</div>
+      <small>Yüzlerce görseli bir seferde seçebilirsiniz · JPG, PNG, WEBP · Seçili kategoriye eklenir</small>
+    </div>
+    <input type="file" id="file" accept="image/*" multiple hidden>
+  </section>
+
+  <section class="panel">
+    <h2>Kitaplar <span id="count" style="color:var(--muted);font-weight:400"></span></h2>
+    <div class="row">
+      <input type="search" id="search" placeholder="Başlığa göre ara…" autocomplete="off">
+      <select id="filterCat" aria-label="Kategoriye göre filtrele"></select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="panel" id="editorPanel">
+    <h2>Seçilen kitabı düzenle</h2>
+    <div class="editor">
+      <div>
+        <div class="preview" id="preview">Önce yukarıdan bir kitap seçin</div>
+        <div class="movers">
+          <button class="btn sm" id="moveL" disabled title="Kategori içinde sola taşı">← Sola</button>
+          <button class="btn sm" id="moveR" disabled title="Kategori içinde sağa taşı">Sağa →</button>
+        </div>
+        <div class="posrow">
+          <input type="number" id="posIn" min="1" placeholder="Sıra" disabled>
+          <button class="btn sm" id="posBtn" disabled>Sıraya taşı</button>
+        </div>
+        <div class="small-note">Sıra, kitabın kendi kategorisi içindeki konumudur.</div>
+      </div>
+      <div>
+        <label for="bookCat" style="margin-top:0">Kategori</label>
+        <select id="bookCat" disabled></select>
+        <label for="title">Başlık (isteğe bağlı)</label>
+        <input type="text" id="title" placeholder="Kitap başlığı" maxlength="200" disabled>
+        <label for="sum">Kitap özeti (okuyucuda kapak yerine gösterilir)</label>
+        <textarea id="sum" placeholder="Kitabın konusunu kısaca anlatan bir metin yazın… Boş bırakırsanız kapak görseli gösterilir." maxlength="1200" style="min-height:120px" disabled></textarea>
+        <label for="text">Metin <span id="loadingTxt" style="display:none">· yükleniyor…</span></label>
+        <textarea id="text" placeholder="Kitabın metnini yazın veya yapıştırın… (400 sayfalık metin sorun değil)" disabled></textarea>
+        <div class="counter"><span><span id="words">0</span> kelime · okuyucuda yaklaşık <span id="pg">0</span> sayfa</span><span><span id="chars">0</span> karakter</span></div>
+        <div class="hint">Enter ile yeni paragraf başlatırsınız. Uzun kitaplar için “.txt dosyasından yükle” düğmesini kullanabilirsiniz (UTF-8). Okuyucuda metin otomatik olarak kitap sayfalarına bölünür.</div>
+        <div class="actions">
+          <button class="btn primary" id="save" disabled>Kaydet</button>
+          <button class="btn" id="txtBtn" disabled>.txt dosyasından yükle</button>
+          <button class="btn danger" id="del" disabled>Kitabı sil</button>
+          <input type="file" id="txtFile" accept=".txt,text/plain" hidden>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Depolama ve yedekleme</h2>
+    <div id="storageTxt" class="hint" style="margin-top:0">Hesaplanıyor…</div>
+    <div class="meter"><i id="storageBar"></i></div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="exportBtn">Yedeği indir (parçalı .json)</button>
+      <button class="btn" id="importBtn">Yedekten yükle</button>
+      <input type="file" id="importFile" accept="application/json,.json" multiple hidden>
+    </div>
+    <div class="hint">İçerik bu tarayıcıda saklanır. Yedek, kategorilerle birlikte her biri yaklaşık 40 MB olan birden fazla dosyaya bölünerek iner. Yüklerken tüm parçaları birlikte seçin; mevcut kitaplarla birleştirilir (aynı kimlikli kitaplar güncellenir).</div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  /* ---- Ortak veritabanı (IndexedDB, sürüm 2) ---- */
+  let dbp=null;
+  function openDB(){
+    if(dbp)return dbp;
+    dbp=new Promise((res,rej)=>{
+      const r=indexedDB.open('ogrencikitap',2);
+      r.onupgradeneeded=()=>{const d=r.result;
+        ['items','covers','thumbs','texts'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,n==='items'?{keyPath:'id'}:undefined);});
+        if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta');};
+      r.onsuccess=()=>{const d=r.result;d.onversionchange=()=>{d.close();dbp=null;};res(d);};
+      r.onerror=()=>{dbp=null;rej(r.error);};
+    });
+    return dbp;
+  }
+  const rq=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});
+  const done=tx=>new Promise((res,rej)=>{tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error);});
+  async function getItems(){const db=await openDB();return (await rq(db.transaction('items').objectStore('items').getAll())).sort((a,b)=>a.order-b.order);}
+  async function getVal(store,key){const db=await openDB();return rq(db.transaction(store).objectStore(store).get(key));}
+  async function putItems(list){if(!list.length)return;const db=await openDB();const tx=db.transaction('items','readwrite');list.forEach(i=>tx.objectStore('items').put(i));return done(tx);}
+  /* Bir kitabı tek işlemde kaydet: extra = {cover,thumb,text} (tanımlı olanlar yazılır) */
+  async function saveBook(meta,extra){
+    const db=await openDB();
+    const map={cover:'covers',thumb:'thumbs',text:'texts'};
+    const names=['items'].concat(Object.keys(map).filter(k=>extra&&extra[k]!==undefined).map(k=>map[k]));
+    const tx=db.transaction(names,'readwrite');
+    tx.objectStore('items').put(meta);
+    Object.keys(map).forEach(k=>{if(extra&&extra[k]!==undefined)tx.objectStore(map[k]).put(extra[k],meta.id);});
+    return done(tx);
+  }
+  async function removeBook(id){
+    const db=await openDB();const tx=db.transaction(['items','covers','thumbs','texts'],'readwrite');
+    ['items','covers','thumbs','texts'].forEach(n=>tx.objectStore(n).delete(id));return done(tx);
+  }
+  async function getMeta(k){return getVal('meta',k);}
+  async function setMeta(k,v){const db=await openDB();const tx=db.transaction('meta','readwrite');tx.objectStore('meta').put(v,k);return done(tx);}
+
+  let bc=null;try{bc=new BroadcastChannel('ogrencikitap');}catch(e){}
+  const notify=()=>{if(bc)bc.postMessage('update');};
+
+  const $=id=>document.getElementById(id);
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const grid=$('grid'),preview=$('preview'),title=$('title'),text=$('text'),sum=$('sum'),bookCat=$('bookCat');
+  const save=$('save'),delBtn=$('del'),moveL=$('moveL'),moveR=$('moveR'),posIn=$('posIn'),posBtn=$('posBtn'),txtBtn=$('txtBtn');
+  let items=[],cats=[],selId=null,loadToken=0;
+  const urlCache=new Map();
+  let prevURL=null;
+
+  function toast(msg,ms){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),ms||2400);}
+  const countWords=s=>{s=(s||'').trim();return s?s.split(/\s+/).length:0;};
+  const newId=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const catName=id=>{const c=cats.find(x=>x.id===id);return c?c.name:'Kategorisiz';};
+
+  /* ---- Görsel işleme ---- */
+  function resize(blob,max,q){
+    return new Promise((res,rej)=>{
+      const url=URL.createObjectURL(blob);const img=new Image();
+      img.onload=()=>{
+        let w=img.naturalWidth,h=img.naturalHeight;
+        const k=Math.min(1,max/Math.max(w,h));w=Math.max(1,Math.round(w*k));h=Math.max(1,Math.round(h*k));
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);
+        URL.revokeObjectURL(url);
+        c.toBlob(b=>b?res(b):rej(new Error('Görsel dönüştürülemedi')),'image/jpeg',q);
+      };
+      img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('Görsel okunamadı'));};
+      img.src=url;
+    });
+  }
+  const blobToDataURL=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(b);});
+  const dataURLToBlob=async d=>(await fetch(d)).blob();
+
+  /* ---- Eski sürüm kayıtlarını (dataURL) yeni biçime dönüştür ---- */
+  async function migrate(){
+    const old=(await getItems()).filter(i=>typeof i.image==='string');
+    if(!old.length)return;
+    toast('Eski kayıtlar yeni biçime dönüştürülüyor…',4000);
+    for(const it of old){
+      try{
+        const blob=await dataURLToBlob(it.image);
+        const cover=await resize(blob,900,0.82),thumb=await resize(cover,360,0.8);
+        const t=it.text||'';
+        await saveBook({id:it.id,title:it.title||'',order:it.order,words:countWords(t),v:2},{cover,thumb,text:t});
+      }catch(e){}
+    }
+    notify();
+  }
+
+  /* ---- Kategoriler ---- */
+  async function ensureCategories(){
+    let c=await getMeta('categories');
+    if(!Array.isArray(c)||!c.length){
+      const t=(await getMeta('sectionTitle'))||'Genel';
+      c=[{id:newId('c'),name:t}];
+      await setMeta('categories',c);
+    }
+    cats=c;
+    const list=await getItems();
+    const fix=list.filter(i=>i.cat===undefined);
+    fix.forEach(i=>{i.cat=cats[0].id;});
+    await putItems(fix);
+  }
+  async function saveCats(){await setMeta('categories',cats);notify();}
+
+  function fillSelects(){
+    const mk=(sel,opts)=>{
+      const v=sel.value;sel.innerHTML='';
+      opts.forEach(([val,label])=>{const o=document.createElement('option');o.value=val;o.textContent=label;sel.appendChild(o);});
+      if([...sel.options].some(o=>o.value===v))sel.value=v;
+    };
+    const real=cats.map(c=>[c.id,c.name]);
+    mk($('uploadCat'),real);
+    mk($('filterCat'),[['all','Tüm kategoriler']].concat(real,[['','Kategorisiz']]));
+    mk(bookCat,real.concat([['','Kategorisiz']]));
+  }
+
+  function renderCats(){
+    const box=$('catList');box.innerHTML='';
+    $('catCount').textContent=cats.length?'('+cats.length+')':'';
+    cats.forEach((c,i)=>{
+      const row=document.createElement('div');row.className='catrow';
+      const inp=document.createElement('input');inp.type='text';inp.value=c.name;inp.maxLength=60;inp.setAttribute('aria-label','Kategori adı');
+      inp.addEventListener('change',async()=>{
+        const v=inp.value.trim();
+        if(!v){inp.value=c.name;return;}
+        c.name=v;await saveCats();fillSelects();renderGrid();toast('Kategori adı kaydedildi ✓');
+      });
+      const cnt=document.createElement('span');cnt.className='cnt';cnt.textContent=items.filter(x=>x.cat===c.id).length+' kitap';
+      const up=document.createElement('button');up.className='btn sm';up.textContent='↑';up.title='Yukarı';up.disabled=i===0;
+      const dn=document.createElement('button');dn.className='btn sm';dn.textContent='↓';dn.title='Aşağı';dn.disabled=i===cats.length-1;
+      const rm=document.createElement('button');rm.className='btn sm danger';rm.textContent='Sil';
+      up.addEventListener('click',()=>moveCat(i,-1));
+      dn.addEventListener('click',()=>moveCat(i,1));
+      rm.addEventListener('click',()=>removeCat(i));
+      row.append(inp,cnt,up,dn,rm);box.appendChild(row);
+    });
+  }
+  async function moveCat(i,d){
+    const j=i+d;if(j<0||j>=cats.length)return;
+    const t=cats[i];cats[i]=cats[j];cats[j]=t;
+    await saveCats();fillSelects();renderCats();
+  }
+  async function removeCat(i){
+    const c=cats[i];
+    if(cats.length<=1){toast('En az bir kategori olmalı');return;}
+    const mine=items.filter(x=>x.cat===c.id);
+    if(!confirm('“'+c.name+'” kategorisi silinsin mi?'+(mine.length?'\n\n'+mine.length+' kitap silinmez, “Kategorisiz” olur.':'')))return;
+    mine.forEach(x=>{x.cat='';});
+    await putItems(mine);
+    cats.splice(i,1);await saveCats();
+    await load();toast('Kategori silindi');
+  }
+  $('addCat').addEventListener('click',async()=>{
+    const inp=$('newCat'),v=inp.value.trim();if(!v)return;
+    if(cats.some(c=>c.name.toLocaleLowerCase('tr')===v.toLocaleLowerCase('tr'))){toast('Bu isimde bir kategori zaten var');return;}
+    const c={id:newId('c'),name:v};cats.push(c);inp.value='';
+    await saveCats();fillSelects();
+    $('uploadCat').value=c.id;try{localStorage.setItem('adUpCat',c.id);}catch(e){}
+    renderCats();toast('Kategori eklendi ✓');
+  });
+  $('newCat').addEventListener('keydown',e=>{if(e.key==='Enter')$('addCat').click();});
+  $('uploadCat').addEventListener('change',e=>{try{localStorage.setItem('adUpCat',e.target.value);}catch(err){}});
+
+  /* ---- Ekleme ---- */
+  async function addFiles(list){
+    const files=[...list].filter(f=>f.type.startsWith('image/'));
+    if(!files.length){toast('Lütfen görsel dosyası seçin');return;}
+    const cat=$('uploadCat').value;
+    let last=null,n=0,base=items.length?items[items.length-1].order:0;
+    for(let k=0;k<files.length;k++){
+      toast('Ekleniyor… '+(k+1)+' / '+files.length,60000);
+      try{
+        const cover=await resize(files[k],900,0.82),thumb=await resize(cover,360,0.8);
+        const id=newId('b');
+        await saveBook({id,title:'',order:++base,words:0,cat,v:2},{cover,thumb,text:''});
+        last=id;n++;
+      }catch(e){toast('Hata: '+e.message);await sleep(900);}
+    }
+    await load();if(last)select(last);notify();refreshStorage();
+    if(n)toast(n+' görsel “'+catName(cat)+'” kategorisine eklendi');
+  }
+
+  /* ---- Liste ---- */
+  const thumbIO=new IntersectionObserver(es=>es.forEach(async e=>{
+    if(!e.isIntersecting)return;thumbIO.unobserve(e.target);
+    const img=e.target,id=img.dataset.id;
+    let u=urlCache.get(id);
+    if(!u){const b=await getVal('thumbs',id);if(b){u=URL.createObjectURL(b);urlCache.set(id,u);}}
+    if(u)img.src=u;
+  }),{root:grid,rootMargin:'200px'});
+
+  async function load(){
+    items=await getItems();
+    renderCats();fillSelects();renderGrid();updateMovers();
+  }
+
+  function renderGrid(){
+    thumbIO.disconnect();grid.innerHTML='';
+    const s=$('search').value.trim().toLocaleLowerCase('tr'),f=$('filterCat').value||'all';
+    const rank=new Map(),counter={};
+    items.forEach(it=>{counter[it.cat]=(counter[it.cat]||0)+1;rank.set(it.id,counter[it.cat]);});
+    const list=items.filter(it=>(f==='all'||(it.cat||'')===f)&&(!s||(it.title||'').toLocaleLowerCase('tr').includes(s)));
+    $('count').textContent=items.length?'('+(list.length!==items.length?list.length+' / ':'')+items.length+')':'';
+    if(!list.length){const d=document.createElement('div');d.className='empty';d.textContent=items.length?'Bu filtreye uyan kitap yok.':'Henüz kitap yok.';grid.appendChild(d);return;}
+    const frag=document.createDocumentFragment();
+    list.forEach(it=>{
+      const b=document.createElement('button');b.type='button';b.className='thumb'+(it.id===selId?' sel':'');
+      const c=document.createElement('div');c.className='c';
+      const im=document.createElement('img');im.alt='';im.dataset.id=it.id;im.decoding='async';c.appendChild(im);b.appendChild(c);
+      thumbIO.observe(im);
+      const ix=document.createElement('div');ix.className='idx';ix.textContent=rank.get(it.id);b.appendChild(ix);
+      if(it.words>0){const g=document.createElement('div');g.className='badge';g.textContent='✓';g.title='Metin eklendi';b.appendChild(g);}
+      const n=document.createElement('div');n.className='n';n.textContent=it.title||('Kitap '+rank.get(it.id));b.appendChild(n);
+      const k=document.createElement('div');k.className='k';k.textContent=catName(it.cat);b.appendChild(k);
+      b.addEventListener('click',()=>select(it.id));
+      frag.appendChild(b);
+    });
+    grid.appendChild(frag);
+  }
+  let st;$('search').addEventListener('input',()=>{clearTimeout(st);st=setTimeout(renderGrid,180);});
+  $('filterCat').addEventListener('change',renderGrid);
+
+  function groupOf(it){return items.filter(x=>x.cat===it.cat);}
+  function updateMovers(){
+    const it=items.find(x=>x.id===selId);
+    if(!it){moveL.disabled=moveR.disabled=posIn.disabled=posBtn.disabled=true;return;}
+    const g=groupOf(it),i=g.indexOf(it);
+    moveL.disabled=i<=0;moveR.disabled=i>=g.length-1;
+    posIn.disabled=posBtn.disabled=false;posIn.max=g.length;posIn.value=i+1;
+  }
+
+  let sT;
+  function stats(){
+    clearTimeout(sT);
+    sT=setTimeout(()=>{
+      const w=countWords(text.value);
+      $('words').textContent=w.toLocaleString('tr');$('chars').textContent=text.value.length.toLocaleString('tr');
+      $('pg').textContent=w?Math.max(1,Math.ceil(w/250)).toLocaleString('tr'):0;
+    },150);
+  }
+
+  async function select(id){
+    selId=id;const it=items.find(x=>x.id===id);renderGrid();
+    if(!it)return;
+    const my=++loadToken;
+    title.value=it.title||'';text.value='';sum.value=it.summary||'';bookCat.value=it.cat||'';
+    [title,text,sum,save,delBtn,txtBtn,bookCat].forEach(e=>e.disabled=true);
+    $('loadingTxt').style.display='inline';
+    const [cover,t]=await Promise.all([getVal('covers',id),getVal('texts',id)]);
+    if(my!==loadToken)return;
+    if(prevURL){URL.revokeObjectURL(prevURL);prevURL=null;}
+    preview.innerHTML='';
+    if(cover){prevURL=URL.createObjectURL(cover);const im=document.createElement('img');im.src=prevURL;preview.appendChild(im);}
+    text.value=t||'';stats();
+    $('loadingTxt').style.display='none';
+    [title,text,sum,save,delBtn,txtBtn,bookCat].forEach(e=>e.disabled=false);updateMovers();
+    if(window.openPanelOnly)window.openPanelOnly($('editorPanel'));
+    setTimeout(()=>$('editorPanel').scrollIntoView({behavior:'smooth',block:'nearest'}),150);
+  }
+
+  function resetEditor(){
+    selId=null;loadToken++;preview.textContent='Önce yukarıdan bir kitap seçin';title.value='';text.value='';sum.value='';stats();posIn.value='';
+    [title,text,sum,save,delBtn,txtBtn,moveL,moveR,posIn,posBtn,bookCat].forEach(e=>e.disabled=true);
+  }
+
+  /* ---- Kategori içinde sıralama ---- */
+  async function moveInCat(newPos){
+    const it=items.find(x=>x.id===selId);if(!it)return;
+    const g=groupOf(it),i=g.indexOf(it);
+    newPos=Math.max(0,Math.min(g.length-1,newPos));
+    if(newPos===i)return;
+    const orders=g.map(x=>x.order),arr=g.slice();
+    arr.splice(i,1);arr.splice(newPos,0,it);
+    const changed=[];
+    arr.forEach((x,k)=>{if(x.order!==orders[k]){x.order=orders[k];changed.push(x);}});
+    await putItems(changed);await load();notify();
+  }
+  moveL.addEventListener('click',()=>{const it=items.find(x=>x.id===selId);if(it)moveInCat(groupOf(it).indexOf(it)-1);});
+  moveR.addEventListener('click',()=>{const it=items.find(x=>x.id===selId);if(it)moveInCat(groupOf(it).indexOf(it)+1);});
+  posBtn.addEventListener('click',()=>{const v=parseInt(posIn.value,10);if(v>=1)moveInCat(v-1);});
+  posIn.addEventListener('keydown',e=>{if(e.key==='Enter')posBtn.click();});
+
+  /* ---- Kaydet / sil ---- */
+  save.addEventListener('click',async()=>{
+    const it=items.find(x=>x.id===selId);if(!it)return;
+    const t=text.value.trim();
+    it.title=title.value.trim();it.summary=sum.value.trim();it.words=countWords(t);it.v=2;it.cat=bookCat.value;
+    save.disabled=true;
+    try{await saveBook(it,{text:t});await load();notify();refreshStorage();toast('Kaydedildi ✓  ('+catName(it.cat)+')');}
+    catch(e){toast('Kaydedilemedi: '+e.message);}
+    save.disabled=false;
+  });
+  delBtn.addEventListener('click',async()=>{
+    if(!selId||!confirm('Bu kitap silinsin mi?'))return;
+    const id=selId;await removeBook(id);
+    const u=urlCache.get(id);if(u){URL.revokeObjectURL(u);urlCache.delete(id);}
+    try{localStorage.removeItem('okPos:'+id);}catch(e){}
+    resetEditor();await load();notify();refreshStorage();toast('Kitap silindi');
+  });
+  text.addEventListener('input',stats);
+
+  txtBtn.addEventListener('click',()=>$('txtFile').click());
+  $('txtFile').addEventListener('change',async e=>{
+    const f=e.target.files[0];e.target.value='';if(!f)return;
+    if(text.value.trim()&&!confirm('Mevcut metin bu dosyanın içeriğiyle değiştirilsin mi?'))return;
+    try{text.value=(await f.text()).replace(/\r\n?/g,'\n').replace(/^﻿/,'');stats();toast('Dosya yüklendi — kaydetmeyi unutmayın');}
+    catch(err){toast('Dosya okunamadı');}
+  });
+
+  /* ---- Yükleme alanı ---- */
+  const drop=$('drop'),file=$('file');
+  drop.addEventListener('click',()=>file.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();file.click();}});
+  file.addEventListener('change',()=>{addFiles(file.files);file.value='';});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+
+  /* ---- Depolama göstergesi ---- */
+  async function refreshStorage(){
+    try{
+      if(navigator.storage&&navigator.storage.estimate){
+        const e=await navigator.storage.estimate();
+        const mb=n=>(n/1048576).toLocaleString('tr',{maximumFractionDigits:1});
+        $('storageTxt').textContent='Kullanılan alan: '+mb(e.usage||0)+' MB'+(e.quota?' / yaklaşık '+mb(e.quota)+' MB':'')+' · '+items.length+' kitap';
+        $('storageBar').style.width=Math.min(100,(e.usage||0)/(e.quota||1)*100)+'%';
+      }else $('storageTxt').textContent=items.length+' kitap';
+    }catch(e){$('storageTxt').textContent=items.length+' kitap';}
+  }
+
+  /* ---- Parçalı yedekleme (kategorilerle birlikte) ---- */
+  function downloadJSON(obj,name){
+    const blob=new Blob([JSON.stringify(obj)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  }
+  $('exportBtn').addEventListener('click',async()=>{
+    const btn=$('exportBtn');btn.disabled=true;
+    try{
+      const list=await getItems(),stamp=new Date().toISOString().slice(0,10);
+      let part=[],size=0,n=0;
+      const flush=async()=>{
+        n++;downloadJSON({version:3,part:n,categories:n===1?cats:undefined,items:part},'ogrencikitap-yedek-'+stamp+'-parca'+n+'.json');
+        part=[];size=0;await sleep(600);
+      };
+      for(let k=0;k<list.length;k++){
+        toast('Yedekleniyor… '+(k+1)+' / '+list.length,60000);
+        const it=list[k];
+        const [c,t,tx]=await Promise.all([getVal('covers',it.id),getVal('thumbs',it.id),getVal('texts',it.id)]);
+        const rec={id:it.id,title:it.title||'',order:it.order,words:it.words||0,cat:it.cat||'',summary:it.summary||'',cover:c?await blobToDataURL(c):'',thumb:t?await blobToDataURL(t):'',text:tx||''};
+        part.push(rec);size+=rec.cover.length+rec.thumb.length+rec.text.length;
+        if(size>40e6)await flush();
+      }
+      if(part.length||n===0)await flush();
+      toast(n+' yedek dosyası indirildi');
+    }catch(e){toast('Yedek alınamadı: '+e.message);}
+    btn.disabled=false;
+  });
+  $('importBtn').addEventListener('click',()=>$('importFile').click());
+  $('importFile').addEventListener('change',async e=>{
+    const files=[...e.target.files];e.target.value='';if(!files.length)return;
+    if(!confirm(files.length+' dosyadaki kitaplar mevcut içerikle birleştirilecek (aynı kimlikli kitaplar güncellenir). Devam edilsin mi?'))return;
+    let total=0;
+    try{
+      for(const f of files){
+        const d=JSON.parse(await f.text());
+        if(!d||!Array.isArray(d.items))throw new Error(f.name+': geçersiz yedek dosyası');
+        if(Array.isArray(d.categories)){
+          d.categories.forEach(c=>{if(c&&c.id&&c.name&&!cats.some(x=>x.id===c.id))cats.push({id:c.id,name:c.name});});
+          await saveCats();
+        }else if(d.sectionTitle&&!cats.length){cats.push({id:newId('c'),name:d.sectionTitle});await saveCats();}
+        let order=items.length?Math.max(...items.map(x=>x.order)):0;
+        for(const r of d.items){
+          if(!r||!r.id)continue;
+          const coverSrc=r.cover||r.image;if(!coverSrc)continue;
+          toast('İçe aktarılıyor… '+(++total),60000);
+          const cover=await dataURLToBlob(coverSrc);
+          const thumb=r.thumb?await dataURLToBlob(r.thumb):await resize(cover,360,0.8);
+          const t=r.text||'';
+          const cat=(r.cat!==undefined)?r.cat:(cats[0]?cats[0].id:'');
+          await saveBook({id:r.id,title:r.title||'',order:(typeof r.order==='number'?r.order:++order),words:countWords(t),cat,summary:r.summary||'',v:2},{cover,thumb,text:t});
+        }
+      }
+      resetEditor();await load();
+      const changed=[];items.forEach((it,k)=>{if(it.order!==k+1){it.order=k+1;changed.push(it);}});
+      if(changed.length){await putItems(changed);await load();}
+      notify();refreshStorage();toast(total+' kitap içe aktarıldı ✓');
+    }catch(err){toast('Yedek yüklenemedi: '+err.message,4000);}
+  });
+
+  (async function init(){
+    try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+    await migrate();
+    await ensureCategories();
+    await load();
+    try{const u=localStorage.getItem('adUpCat');if(u&&cats.some(c=>c.id===u))$('uploadCat').value=u;}catch(e){}
+    refreshStorage();
+  })();
+})();
+</script>
+<script>
+/* Panelleri akordeon çekmeceye çevir: biri açılınca diğerleri kapanır */
+(function(){
+  const panels=[...document.querySelectorAll('.wrap > .panel')];
+  const CH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  function setOpen(p,open){
+    p.classList.toggle('open',open);
+    p._h.setAttribute('aria-expanded',open?'true':'false');
+    p._d.inert=!open;
+  }
+  function openOnly(p){panels.forEach(x=>setOpen(x,x===p));}
+  panels.forEach((p,i)=>{
+    const h=p.querySelector(':scope > h2'); if(!h)return;
+    const d=document.createElement('div');d.className='adrawer';
+    const inner=document.createElement('div');inner.className='adrawer-inner';
+    while(h.nextSibling)inner.appendChild(h.nextSibling);
+    d.appendChild(inner);p.appendChild(d);
+    const c=document.createElement('span');c.className='chev';c.setAttribute('aria-hidden','true');c.innerHTML=CH;h.appendChild(c);
+    h.setAttribute('role','button');h.tabIndex=0;
+    p.classList.add('acc');p._h=h;p._d=d;
+    const toggle=()=>{ if(p.classList.contains('open'))setOpen(p,false); else openOnly(p); };
+    h.addEventListener('click',toggle);
+    h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+    setOpen(p,false);
+  });
+  window.openPanelOnly=function(el){ if(el&&el.classList.contains('acc'))openOnly(el); };
+})();
+</script>
+</body>
+</html>
