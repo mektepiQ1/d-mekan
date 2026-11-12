@@ -1,5 +1,5 @@
-const V = 'og-v13';
-const FILES = ['ogrenci.html', 'admin.html', 'admin.js', 'ogrenci.js', 'manifest.webmanifest', 'kapi.js', 'soru.html', 'deneme.html', 'konu.html', 'defter.html', 'dersprogram.html'];
+const V = 'og-v14';
+const FILES = ['ogrenci.html', 'admin.html', 'admin.js', 'ogrenci.js', 'manifest.webmanifest', 'kapi.js', 'soru.html', 'deneme.html', 'konu.html', 'defter.html', 'dersprogram.html', 'muzik.js', 'kitap-tek.js'];
 const FB = 'https://www.gstatic.com/firebasejs/13.1.0/';
 const EXT = [
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
@@ -48,6 +48,8 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (u.origin !== location.origin) return;
+  // Ses dosyaları ve aralık (Range) istekleri servis çalışanından geçmesin: müzik doğrudan ağdan akar.
+  if (e.request.headers.has('range') || /\.(mp3|m4a|ogg|wav)$/i.test(u.pathname)) return;
   e.respondWith(fetch(e.request).then(r => {
     if (r.ok && r.type === 'basic') { const c = r.clone(); caches.open(V).then(x => x.put(e.request, c)).catch(() => {}); }
     return r;
