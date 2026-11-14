@@ -1,5 +1,5 @@
-const V = 'og-v13';
-const FILES = ['ogrenci.html', 'admin.html', 'admin.js', 'ogrenci.js', 'manifest.webmanifest', 'kapi.js', 'soru.html', 'deneme.html', 'konu.html', 'defter.html', 'dersprogram.html'];
+const V = 'og-v14';
+const FILES = ['ogrenci.html', 'admin.html', 'admin.js', 'ogrenci.js', 'manifest.webmanifest', 'kapi.js', 'ortak.js', 'soru.html', 'deneme.html', 'konu.html', 'defter.html', 'dersprogram.html'];
 const FB = 'https://www.gstatic.com/firebasejs/13.1.0/';
 const EXT = [
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',

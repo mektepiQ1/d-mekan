@@ -290,7 +290,7 @@ const U = {
         <input name="c" maxlength="200" autocomplete="off" placeholder="Kitabın altında görünecek yazı (boşsa ders adı görünür)" value="${esc(l.img_caption || '')}">
         ${store !== 'topics' ? '' : `<input name="u" type="url" autocomplete="off" placeholder="Kitaba dokununca açılacak link (https://...)" value="${esc(l.img_link || '')}">`}
         <button>Kaydet</button></form>
-      ${store === 'lessons' ? '<div class="hint">Soru bankası linki otomatik verilir: bu derse soruadmin.html\'de bağladığınız konular açılır.</div>' : store === 'exams' ? '<div class="hint">Deneme linki otomatik verilir: bu başlığa denemeadmin.html\'de bağladığınız konular açılır.</div>' : ''}
+      ${store === 'lessons' ? '<div class="hint">Soru bankası linki otomatik verilir: soruadmin.html\'den bu derse HTML dosyası gönderdiğinizde konular açılır.</div>' : store === 'exams' ? '<div class="hint">Deneme linki otomatik verilir: denemeadmin.html\'den bu başlığa HTML dosyası gönderdiğinizde denemeler açılır.</div>' : ''}
       <div class="hint">En iyi görünüm için dikey kapak kullanın (yaklaşık 247×385 oranı). Öğrenci panelinde 3 boyutlu kitap olarak raflanır.</div>
       ${l.img ? `<div class="tact"><button class="sm" type="button" data-a="editImg" data-k="${store}" data-id="${l.id}">Düzenle</button>
         <button class="sm del" type="button" data-a="delImg" data-k="${store}" data-id="${l.id}">Görseli Kaldır</button></div>` : ''}</div>`;

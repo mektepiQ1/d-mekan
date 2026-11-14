@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a1f44">
 <script src="kapi.js"></script>
+<script src="ortak.js"></script>
 <title>Öğrenci Bahçesi — Konu anlatımı</title>
 <style>
 /* Öğrenci Bahçesi — beyaz & lacivert tema */
@@ -261,6 +262,21 @@ body.reader-open{overflow:hidden}
 
 /* Sadece işaretlileri göster */
 .reader-text.summary{white-space:normal}
+/* HTML'den gelen biçimli konu anlatımı: sayfa gibi beyaz zemin, özgün biçim korunur */
+.reader-text.rich{white-space:normal;background:#fff;color:#1b2433;padding:18px 16px;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+.reader-text.rich h1,.reader-text.rich h2,.reader-text.rich h3,.reader-text.rich h4,.reader-text.rich h5,.reader-text.rich h6{line-height:1.3;margin:1.1em 0 .45em;color:#0f1b33}
+.reader-text.rich h1{font-size:1.45em}.reader-text.rich h2{font-size:1.25em}.reader-text.rich h3{font-size:1.1em}
+.reader-text.rich>:first-child,.reader-text.rich>div>:first-child{margin-top:0}
+.reader-text.rich p{margin:.6em 0}
+.reader-text.rich ul,.reader-text.rich ol{margin:.6em 0;padding-left:1.4em}
+.reader-text.rich table{border-collapse:collapse;display:block;max-width:100%;overflow-x:auto;margin:.8em 0}
+.reader-text.rich th,.reader-text.rich td{border:1px solid #b8c2d6;padding:6px 9px;vertical-align:top}
+.reader-text.rich th{background:#eef2fa}
+.reader-text.rich blockquote{margin:.8em 0;padding:.2em 1em;border-left:4px solid #9fb3d6;color:#44506b}
+.reader-text.rich img{max-width:100%;height:auto}
+.reader-text.rich pre{white-space:pre-wrap;background:#f3f5f9;padding:10px;border-radius:8px;overflow-x:auto}
+.reader-text.rich hr{border:0;border-top:1px solid #c9d5ea;margin:1em 0}
+.reader-text.rich a{color:#2a4d8f;text-decoration:underline}
 .sum-hint{margin:0;font-size:13px;color:var(--navy-600)}
 .sum-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
 .sum-top .btn{flex:none}
@@ -612,6 +628,7 @@ input[type=text],input[type=search],textarea{max-width:100%;min-width:0}
   // Metni, işaretli kısımları <mark> yaparak çizer (metin yine textContent ile yazılır)
   function paintSummary() {
     rdText.classList.add('summary');
+    rdText.classList.remove('rich');
     const frag = document.createDocumentFragment();
     const back = el('button', { class: 'btn btn-primary', type: 'button', 'data-back': '1', text: '← Konuya dön' });
     if (!marks.length) {
@@ -631,9 +648,34 @@ input[type=text],input[type=search],textarea{max-width:100%;min-width:0}
     rdText.replaceChildren(frag);
   }
 
+  // Biçimli (HTML) sayfa: işaretler, görünen metindeki konuma göre metin düğümlerinin içine <mark> olarak sarılır
+  function paintHtml() {
+    const top = rdBody.scrollTop, box = document.createElement('div');
+    box.append(...Ortak.cocuklar(curPage.html));
+    const w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT), list = [];
+    let n, acc = 0;
+    while ((n = w.nextNode())) { list.push([n, acc]); acc += n.data.length; }
+    list.forEach(([node, start]) => {
+      const end = start + node.data.length, frag = document.createDocumentFragment();
+      let p = 0;
+      marks.forEach(([s, e, c], i) => {
+        const a = Math.max(s, start) - start, b = Math.min(e, end) - start;
+        if (b <= a) return;
+        if (a > p) frag.append(node.data.slice(p, a));
+        frag.append(el('mark', { class: 'hl hl-' + c, 'data-i': i, 'data-note': noteOf([s, e]) ? '1' : null, text: node.data.slice(a, b) }));
+        p = b;
+      });
+      if (p) { if (p < node.data.length) frag.append(node.data.slice(p)); node.replaceWith(frag); }
+    });
+    rdText.replaceChildren(...box.childNodes);
+    rdBody.scrollTop = top;
+  }
+
   function paint() {
     if (summary) return paintSummary();
     rdText.classList.remove('summary');
+    rdText.classList.toggle('rich', !!curPage.html);
+    if (curPage.html) return paintHtml();
     const text = curPage.icerik, frag = document.createDocumentFragment();
     let pos = 0;
     marks.forEach(([s, e, c], i) => {
@@ -885,7 +927,14 @@ input[type=text],input[type=search],textarea{max-width:100%;min-width:0}
     timer = setTimeout(() => { qRaw = qEl.value.trim(); query = lc(qRaw); render(); }, 180);
   });
 
-  window.konuVeriVer = function (data) { konular = data; lcCache.clear(); render(); };
+  // HTML olarak saklanan sayfalar (başında <!--h-->) temizlenir; icerik = ekranda görünen düz metin (arama ve işaret konumları buna göre)
+  const veriHazirla = data => (data || []).map(k => Object.assign({}, k, { sayfalar: (k.sayfalar || []).map(s => {
+    const ham = String(s.icerik == null ? '' : s.icerik);
+    if (!window.Ortak || !ham.startsWith(Ortak.ISARET)) return s;
+    const h = Ortak.hazirla(ham);
+    return Object.assign({}, s, { html: h.html, icerik: h.text });
+  }) }));
+  window.konuVeriVer = function (data) { konular = veriHazirla(data); lcCache.clear(); render(); };
   window.konuMesaj = function (t) { listEl.replaceChildren(emptyBox(t)); statEl.textContent = ''; };
   window.konuMesaj('Yükleniyor…');
 })();
