@@ -1,0 +1,494 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    },
+    "usernames": {
+      "$key": {
+        ".read": true,
+        ".write": "root.child('admins').child(auth.uid).val() === true",
+        ".validate": "newData.hasChildren(['email', 'uid']) && newData.child('email').isString() && newData.child('uid').isString()"
+      }
+    },
+    "users": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && data.exists() && newData.exists() && !data.child('exam').exists() && newData.child('exam').exists() && newData.child('education_status').exists() && newData.child('class_id').exists() && newData.child('username').val() === data.child('username').val() && newData.child('id').val() === data.child('id').val() && newData.child('created_at').val() === data.child('created_at').val()",
+        ".validate": "newData.hasChildren(['id', 'username'])",
+        "id": {
+          ".validate": "newData.isString() && newData.val().length <= 128"
+        },
+        "_fbKey": {
+          ".validate": "newData.isString() && newData.val().length <= 128"
+        },
+        "username": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "exam": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "education_status": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "class_id": {
+          ".validate": "newData.isNumber()"
+        },
+        "created_at": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "classes": {
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "lessons": {
+      ".indexOn": [
+        "class_id"
+      ],
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || (root.child('users').child(auth.uid).child('class_id').exists() && query.orderByChild === 'class_id' && query.equalTo === root.child('users').child(auth.uid).child('class_id').val()))",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "exams": {
+      ".indexOn": [
+        "class_id"
+      ],
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || (root.child('users').child(auth.uid).child('class_id').exists() && query.orderByChild === 'class_id' && query.equalTo === root.child('users').child(auth.uid).child('class_id').val()))",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "topics": {
+      ".indexOn": [
+        "class_id"
+      ],
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || (root.child('users').child(auth.uid).child('class_id').exists() && query.orderByChild === 'class_id' && query.equalTo === root.child('users').child(auth.uid).child('class_id').val()))",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "options": {
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "links": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "devices": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$slot": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "($slot === 's1' || $slot === 's2') && newData.hasChildren(['id', 'created_at', 'last_seen'])",
+          "id": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
+          },
+          "created_at": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "last_seen": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "label": {
+            ".validate": "newData.isString() && newData.val().length <= 60"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "keys": {
+      "$uid": {
+        "$did": {
+          ".read": "auth != null && auth.uid === $uid && (root.child('devices').child($uid).child('s1').child('id').val() === $did || root.child('devices').child($uid).child('s2').child('id').val() === $did)",
+          ".write": "auth != null && ((auth.uid === $uid && (!newData.exists() || (!data.exists() && (root.child('devices').child($uid).child('s1').child('id').val() === $did || root.child('devices').child($uid).child('s2').child('id').val() === $did)))) || (root.child('admins').child(auth.uid).val() === true && !newData.exists()))",
+          ".validate": "newData.isString() && newData.val().length === 44"
+        }
+      }
+    },
+    "classRequests": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && (!newData.exists() || root.child('users').child($uid).child('class_id').exists())",
+        ".validate": "newData.hasChildren(['username', 'to_class_id', 'to_class_name', 'requested_at']) && newData.child('username').val() === root.child('users').child($uid).child('username').val()",
+        "username": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "from_class_id": {
+          ".validate": "newData.isNumber()"
+        },
+        "to_class_id": {
+          ".validate": "newData.isNumber()"
+        },
+        "to_class_name": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "requested_at": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "stamps": {
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+      "$cid": {
+        ".validate": "newData.isString() && newData.val().length <= 100"
+      }
+    },
+    "userData": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        "$arac": {
+          ".validate": "$arac.matches(/^[a-z0-9_-]{1,40}$/)",
+          "$anahtar": {
+            ".validate": "$anahtar.matches(/^[A-Za-z0-9_.-]{1,60}$/) && newData.isString() && newData.val().length <= 400000"
+          }
+        }
+      }
+    },
+    "sb": {
+      "meta": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "guncelleme": {
+          ".validate": "newData.isNumber()"
+        },
+        "$diger": {
+          ".validate": false
+        }
+      },
+      "konular": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$konuId": {
+          ".validate": "newData.hasChildren(['konu_adi', 'olusturma'])",
+          "konu_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "ders_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 30"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      },
+      "testler": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        ".indexOn": [
+          "konu_id"
+        ],
+        "$testId": {
+          ".validate": "newData.hasChildren(['konu_id', 'test_adi', 'olusturma'])",
+          "konu_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "test_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 150"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "soru_sayisi": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "guncelleme": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      },
+      "sorular": {
+        ".read": false,
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$testId": {
+          ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+          ".indexOn": [
+            "sira"
+          ],
+          "$soruId": {
+            ".validate": "newData.hasChildren(['soru_metni', 'dogru_cevap', 'sira', 'olusturma'])",
+            "soru_metni": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+            },
+            "cevap_a": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_b": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_c": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_d": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_e": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "dogru_cevap": {
+              ".validate": "newData.isString() && newData.val().matches(/^[A-E]$/)"
+            },
+            "sira": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "olusturma": {
+              ".validate": "newData.isNumber()"
+            },
+            "$diger": {
+              ".validate": false
+            }
+          }
+        }
+      },
+      ".read": false,
+      ".write": false,
+      "anlatim": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "surum": {
+          ".validate": "newData.isNumber()"
+        },
+        "konular": {
+          "$k": {
+            "konuAdi": {
+              ".validate": "newData.isString() && newData.val().length <= 200"
+            },
+            "sira": {
+              ".validate": "newData.isNumber()"
+            },
+            "sayfalar": {
+              "$s": {
+                "sayfaAdi": {
+                  ".validate": "newData.isString() && newData.val().length <= 200"
+                },
+                "sira": {
+                  ".validate": "newData.isNumber()"
+                },
+                "icerik": {
+                  ".validate": "newData.isString() && newData.val().length <= 400000"
+                }
+              }
+            }
+          }
+        }
+      },
+      "akonular": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$id": {
+          ".validate": "newData.hasChildren(['konu_adi', 'ders_id', 'olusturma'])",
+          "konu_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "ders_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 30"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      },
+      "asayfalar": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$id": {
+          ".validate": "newData.hasChildren(['konu_id', 'sayfa_adi', 'olusturma'])",
+          "konu_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "sayfa_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 150"
+          },
+          "sira": {
+            ".validate": "newData.isNumber()"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "guncelleme": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      },
+      "aicerik": {
+        ".read": false,
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$id": {
+          ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+          ".validate": "newData.isString() && newData.val().length <= 400000"
+        }
+      },
+      "videolar": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$videoId": {
+          ".validate": "newData.hasChildren(['ders_id', 'ogretmen', 'konu', 'baslik', 'sira', 'olusturma'])",
+          "ders_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 30"
+          },
+          "ders_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+          },
+          "ogretmen": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "konu": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 150"
+          },
+          "baslik": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 150"
+          },
+          "vid": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 20"
+          },
+          "liste": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80"
+          },
+          "bas": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "sira": {
+            ".validate": "newData.isNumber()"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "dn": {
+      "meta": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "guncelleme": {
+          ".validate": "newData.isNumber()"
+        },
+        "$diger": {
+          ".validate": false
+        }
+      },
+      "konular": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$konuId": {
+          ".validate": "newData.hasChildren(['konu_adi', 'olusturma'])",
+          "konu_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "ders_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 30"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      },
+      "testler": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        ".indexOn": [
+          "konu_id"
+        ],
+        "$testId": {
+          ".validate": "newData.hasChildren(['konu_id', 'test_adi', 'olusturma'])",
+          "konu_id": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "test_adi": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 150"
+          },
+          "olusturma": {
+            ".validate": "newData.isNumber()"
+          },
+          "soru_sayisi": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "guncelleme": {
+            ".validate": "newData.isNumber()"
+          },
+          "$diger": {
+            ".validate": false
+          }
+        }
+      },
+      "sorular": {
+        ".read": false,
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        "$testId": {
+          ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || root.child('users').child(auth.uid).exists())",
+          ".indexOn": [
+            "sira"
+          ],
+          "$soruId": {
+            ".validate": "newData.hasChildren(['soru_metni', 'dogru_cevap', 'sira', 'olusturma'])",
+            "soru_metni": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+            },
+            "cevap_a": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_b": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_c": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_d": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "cevap_e": {
+              ".validate": "newData.isString() && newData.val().length <= 500"
+            },
+            "dogru_cevap": {
+              ".validate": "newData.isString() && newData.val().matches(/^[A-E]$/)"
+            },
+            "sira": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "olusturma": {
+              ".validate": "newData.isNumber()"
+            },
+            "$diger": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    }
+  }
+}
