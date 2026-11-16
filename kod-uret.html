@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Kod Üretici</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f5f7fa;color:#2d3748;margin:0;padding:16px}
+.c{max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+h1{font-size:20px;color:#2c3e66;margin:0 0 4px}.w{background:#fffaf0;border:1px solid #fbd38d;color:#7b341e;border-radius:10px;padding:10px;font-size:13px;margin:10px 0 16px}
+label{display:block;font-size:13px;margin:12px 0 4px;color:#4a5568}input,select,textarea{width:100%;padding:11px;border:1.5px solid #e2e8f0;border-radius:10px;font:16px inherit;box-sizing:border-box}
+textarea{font:13px monospace}button{width:100%;padding:12px;border:0;border-radius:10px;background:#2c3e66;color:#fff;font-size:16px;margin-top:14px}button.g{background:#e2e8f0;color:#2d3748;margin-top:8px}
+.e{color:#c53030;font-size:13px;min-height:18px;margin-top:8px}table{width:100%;font-size:12px;border-collapse:collapse;margin-top:8px}td{padding:5px 3px;border-bottom:1px solid #edf2f7}
+</style></head><body><div class="c">
+<h1>🔑 Kod Üretici</h1>
+<div class="w"><b>Gizli anahtar bu dosyadadır.</b> Bu dosyayı GitHub'a/siteye <b>yüklemeyin</b>; yalnızca kendi telefonunuzda/bilgisayarınızda tutun ve yedekleyin.</div>
+<label>Öğrencinin cihaz numarası</label><input id="no" placeholder="XXXX-XXXX" autocapitalize="characters" autocomplete="off">
+<label>Kod türü</label><select id="rol"><option value="0">Öğrenci</option><option value="1">Yönetici (kendi cihazlarınız)</option></select>
+<label>Bitiş tarihi (boş = süresiz)</label><input id="tar" type="date">
+<label>Uygulama adresi (ogrenci.html)</label><input id="url" placeholder="https://kullanici.github.io/uygulama/ogrenci.html">
+<button id="uret">Kod üret</button><div class="e" id="hata"></div>
+<div id="sonuc" hidden><label>Etkinleştirme kodu</label><textarea id="kod" rows="4" readonly></textarea>
+<button class="g" id="kk">Kodu kopyala</button><button class="g" id="kl">Etkinleştirme bağlantısını kopyala</button></div>
+<label style="margin-top:20px">Üretilen kodlar</label><table id="log"></table></div>
+<script>
+const PRV={"kty": "EC", "x": "i8hH7ahK63ouLJlR2Oepa7Ljs1zTo89jVgO2U2rKVNI", "y": "89ah6PiSoKSTKYEr5boENB3ZB79kQWkuSzuSumZVJRQ", "crv": "P-256", "d": "1nnOxsc-HdM9aREV14fJTtp5EUjhJTiuXZAqqo_wh9c"}, KEY="AoRPA0H6Y5sY-N3_slV3kA";
+const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', $=i=>document.getElementById(i);
+const b64u=u=>{let s='';for(const x of u)s+=String.fromCharCode(x);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const b64d=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+function dec32(s){let v=0,b=0;const o=[];for(const ch of s){const i=A.indexOf(ch);if(i<0)return null;v=(v<<5)|i;b+=5;if(b>=8){o.push((v>>>(b-8))&255);b-=8;v&=(1<<b)-1}}return o.length===5?o:null}
+$('url').value=localStorage.getItem('ku_url')||'';
+const gunluk=()=>JSON.parse(localStorage.getItem('ku_log')||'[]');
+function ciz(){$('log').innerHTML=gunluk().slice(-30).reverse().map(l=>`<tr><td>${l.t}</td><td>${l.d}</td><td>${l.r?'Yönetici':'Öğrenci'}</td><td>${l.b||'süresiz'}</td></tr>`).join('')}ciz();
+$('uret').onclick=async()=>{
+  $('hata').textContent='';const no=$('no').value.toUpperCase().replace(/[^A-Z0-9]/g,''),dev=dec32(no);
+  if(!dev)return void($('hata').textContent='Cihaz numarası 8 karakter olmalı (örn. K7F2-9QXM).');
+  let gun=0xFFFF;if($('tar').value){gun=Math.floor((Date.parse($('tar').value+'T00:00:00Z')-Date.UTC(2025,0,1))/864e5);if(gun<0||gun>0xFFFE)return void($('hata').textContent='Tarih geçersiz.')}
+  const yuk=new Uint8Array(24);yuk[0]=+$('rol').value;yuk.set(dev,1);yuk[6]=gun>>8;yuk[7]=gun&255;yuk.set(b64d(KEY),8);
+  const k=await crypto.subtle.importKey('jwk',PRV,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
+  const imza=new Uint8Array(await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},k,yuk));
+  const kod=b64u(new Uint8Array([...yuk,...imza]));
+  $('kod').value=kod;$('sonuc').hidden=false;localStorage.setItem('ku_url',$('url').value.trim());
+  const l=gunluk();l.push({t:new Date().toLocaleString('tr'),d:no.slice(0,4)+'-'+no.slice(4),r:+$('rol').value,b:$('tar').value});localStorage.setItem('ku_log',JSON.stringify(l));ciz();
+};
+const kop=async m=>{try{await navigator.clipboard.writeText(m)}catch(_){$('kod').select();document.execCommand('copy')}};
+$('kk').onclick=()=>kop($('kod').value);
+$('kl').onclick=()=>{const u=$('url').value.trim().replace(/#.*$/,'');if(!u)return void($('hata').textContent='Önce uygulama adresini yazın.');kop(u+'#k='+$('kod').value)};
+</script></body></html>
