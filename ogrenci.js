@@ -555,6 +555,7 @@ const U = {
             <nav class="navbar"><ul class="nl">
               ${LINKS.map(([t, u]) => `<li><a href="${u}" rel="noopener noreferrer">${t}</a></li>`).join('')}
             </ul></nav>
+            ${pkg && navigator.onLine ? '<button type="button" class="pk" data-a="dl" style="margin-top:12px">İçeriği Güncelle</button><div class="pkg-s" id="pkgs" role="status" aria-live="polite"></div>' : ''}
           </div>
         </details>
       </div>
@@ -578,16 +579,21 @@ const U = {
   }
 
   /* Cihazdaki paketten panel çizer (sunucu yokken). Paket yoksa false döner. */
-  /* Cihazda paket varken sunucu ile tek teması: 10 günlük doğrulama. Yalnızca öğrencinin kendi yedek düğümünden küçük bir kayıt okunur;
-     sınıf/ders/içerik/güncelleme çekilmez. Başarılıysa damga yenilenir (defter ve program sayfaları da yedekleyince damgayı yeniler). */
+  /* Cihazda paket varken sunucu ile tek teması: 10 günlük doğrulama. Yalnızca öğrencinin kendi kullanıcı kaydı okunur;
+     sınıf/ders/içerik/güncelleme çekilmez. true = geçerli (damga yenilenir) · null = kayıt yok (yönetici erişimi kaldırmış) · false = doğrulanamadı. */
   async function dogrula(uid) {
-    try { await get(ref(db, `userData/${uid}/program/ob_slots`)); Ok.set(uid); return true; } catch { return false; }
+    try { const u = await DB.get('users', uid); if (u) { Ok.set(uid); return true; } return null; } catch { return false; }
   }
   async function offlinePanel(uid) {
     const pkg = await Pkg.forUser(uid).catch(() => null);
     if (!pkg) return false;
     if (!standalone()) { app.innerHTML = browserCard(true); return true; }
-    if (!Ok.valid(uid) && !(navigator.onLine && await dogrula(uid))) {
+    let dg = true;
+    if (!Ok.valid(uid)) {
+      dg = navigator.onLine ? await dogrula(uid) : false;
+      if (dg === null) return false;                 // erişim kaldırılmış: normal akış (paket silinir, aktivasyon ekranı) devam etsin
+    }
+    if (!dg) {
       app.innerHTML = `<div class="card"><div class="alert off" role="status">Güvenlik için en az 10 günde bir internete bağlanman gerekiyor. İnternete bağlanıp uygulamayı yeniden aç; paketin silinmedi.</div></div>`;
       return true;
     }

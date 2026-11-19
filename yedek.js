@@ -32,21 +32,15 @@ const chip = (() => {
   };
 })();
 
-/* Başarılı bir yedekleme, 10 günlük "internete bağlandı" damgasını da yeniler (ogrenci.js / kapi.js aynı damgayı okur). */
-function okTazele(uid) {
-  try {
-    const o = JSON.parse(localStorage.getItem('og-ok') || 'null'), n = Date.now();
-    if (o && o.uid === uid) { o.t = n; o.s = Math.max(o.s || 0, n); Storage.prototype.setItem.call(localStorage, 'og-ok', JSON.stringify(o)); }
-  } catch {}
-}
-
 export function yedekle(arac, oku) {
   if (!IZINLI.includes(arac)) throw new Error('İzin verilmeyen yedek alanı: ' + arac);
   const BEK = 'og-bekle-' + arac;
   let uid = null, calisiyor = false, tm = null;
   const yol = k => `userData/${uid}/${arac}/${k}`;
-  const bekle = () => { try { return JSON.parse(localStorage.getItem(BEK) || '{}') || {}; } catch { return {}; } };
-  const yaz = o => { try { Object.keys(o).length ? Storage.prototype.setItem.call(localStorage, BEK, JSON.stringify(o)) : localStorage.removeItem(BEK); } catch {} };
+  /* Bekleme sırası hesaba aittir: aynı cihaza başka öğrenci girerse öncekinin bekleyenleri yeni hesaba GİTMEZ (yeni hesabın kayıtlarını silmesin). */
+  const sahip = () => uid || (() => { try { return localStorage.getItem('og-data-uid') || ''; } catch { return ''; } })();
+  const bekle = () => { try { const o = JSON.parse(localStorage.getItem(BEK) || 'null'); return o && o.u === sahip() && o.k && typeof o.k === 'object' ? o.k : {}; } catch { return {}; } };
+  const yaz = k => { try { Object.keys(k).length ? Storage.prototype.setItem.call(localStorage, BEK, JSON.stringify({ u: sahip(), k })) : localStorage.removeItem(BEK); } catch {} };
   const hazir = new Promise(res => { const off = onAuthStateChanged(auth, u => { off(); uid = u ? u.uid : null; res(uid); }); });
 
   /* Bekleyen kayıtları (yazılan/silinen) hesaba gönderir. İnternet yoksa hiçbir şey yapmaz; kayıtlar cihazda bekler. */
@@ -68,7 +62,6 @@ export function yedekle(arac, oku) {
       const simdi = bekle();                                       // gönderirken değişen kayıtlar bekleyenlerde kalır
       anahtarlar.forEach(k => { if (simdi[k] === b[k]) delete simdi[k]; });
       yaz(simdi);
-      okTazele(uid);
       if (buyuk) chip('Bazı kayıtlar çok büyük olduğu için yedeklenemedi.', 6000);
       return true;
     } catch (e) {

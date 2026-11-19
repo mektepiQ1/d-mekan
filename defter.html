@@ -836,8 +836,11 @@ window.__senkron = {                                  // sayfa her kaydettiğind
   const ILK = 'og-ilk-' + ARAC + '-' + uid;
   const bos = !dersler.length && !notlar.length;
   let ilkYapildi = false; try { ilkYapildi = localStorage.getItem(ILK) === '1'; } catch (_) {}
-  if (!bos && ilkYapildi) return;
+  const SON = 'og-oku-' + ARAC + '-' + uid;                         // boş cihazda hesabı en çok günde bir kez yokla
+  let son = 0; try { son = +localStorage.getItem(SON) || 0; } catch (_) {}
+  if (ilkYapildi && (!bos || Date.now() - son < 864e5)) return;
   const uzak = await y.uzak();
+  try { localStorage.setItem(SON, String(Date.now())); localStorage.setItem(ILK, '1'); } catch (_) {}     // okundu: ilk kontrol yapıldı sayılır
 
   if (bos) {            // cihaz boş (veri temizlenmiş / yeni cihaz): hesaptan geri yükle
     const liste = Object.entries(uzak).filter(([k, v]) => /^[sn]\d+$/.test(k) && typeof v === 'string');

@@ -1937,7 +1937,7 @@ html[data-tema="dark"] details.soru-cozum>summary{color:#9fb3d6}
             const degisti = await katalogGuncelle();
             if (!onbellekVar && !konular.length && !testler.length && !degisti) throw new Error('baglanti');
             if (degisti || !onbellekVar) { indeksle(); katalogCiz(''); }
-            if (navigator.onLine) hepsiniIndir().then(() => icerikBitir(() => vdYukle().catch(() => {})));
+            if (navigator.onLine && !VERI.icerikKilit()) hepsiniIndir().then(() => icerikBitir(() => vdYukle().catch(() => {})));
             else icerikBildir(false);
         } catch (err) {
             console.error(err);

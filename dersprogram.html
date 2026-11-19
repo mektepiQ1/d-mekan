@@ -279,8 +279,12 @@ Storage.prototype.setItem = function (k, v) {      // sayfanın her kaydında ye
   // Hesaptan okuma yalnızca gerektiğinde: cihazda veri eksikse (geri yükleme) ya da bu cihazda ilk kez (bir kerelik yedek karşılaştırması).
   const ILK = 'og-ilk-' + ARAC + '-' + uid;
   let ilkYapildi = false; try { ilkYapildi = localStorage.getItem(ILK) === '1'; } catch (_) {}
-  if (ilkYapildi && KEYS.every(k => localStorage.getItem(k) !== null)) return;
+  const SON = 'og-oku-' + ARAC + '-' + uid;                         // cihaz tamamen boşsa hesabı en çok günde bir kez yokla
+  let son = 0; try { son = +localStorage.getItem(SON) || 0; } catch (_) {}
+  const bosCihaz = KEYS.every(k => localStorage.getItem(k) === null);
+  if (ilkYapildi && (!bosCihaz || Date.now() - son < 864e5)) return;
   const uzak = await y.uzak();
+  orig.call(localStorage, SON, String(Date.now()));
   let geri = false;
   for (const k of KEYS) {
     const yerel = localStorage.getItem(k);
