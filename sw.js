@@ -1,4 +1,4 @@
-const V = 'og-v21';
+const V = 'og-v22';
 const FILES = ['ogrenci.html', 'admin.html', 'admin.js', 'ogrenci.js', 'manifest.webmanifest', 'kapi.js', 'veri.js', 'sekil.js', 'yedek.js', 'soru.html', 'deneme.html', 'konu.html', 'defter.html', 'dersprogram.html'];
 const FB = 'https://www.gstatic.com/firebasejs/13.1.0/';
 const EXT = [
